@@ -1,0 +1,16 @@
+# Node & React
+node_modules/
+frontend/node_modules/
+dist/
+.env
+
+# Python & Backend
+__pycache__/
+*.pyc
+venv/
+env/
+backend/venv/
+
+# Mac/Windows System files
+.DS_Store
+Thumbs.db
