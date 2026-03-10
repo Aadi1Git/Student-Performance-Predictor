@@ -53,7 +53,8 @@ const App = () => {
     
     try {
       const response = await axios.post('https://student-performance-predictor-rbqq.onrender.com/predict', formData);
-      setTimeout(() => setPrediction(response.data.predicted_score), 500);
+      // This ensures the score never goes above 100
+    setTimeout(() => setPrediction(Math.min(100, response.data.predicted_score)), 500);
     } catch (err) {
       setError('Error: ' + (err.response?.data?.detail || err.message));
     } finally {
