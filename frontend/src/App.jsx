@@ -52,7 +52,7 @@ const App = () => {
     setError('');
     
     try {
-      const response = await axios.post('http://localhost:8000/predict', formData);
+      const response = await axios.post('https://student-performance-predictor-rbqq.onrender.com/predict', formData);
       setTimeout(() => setPrediction(response.data.predicted_score), 500);
     } catch (err) {
       setError('Error: ' + (err.response?.data?.detail || err.message));
