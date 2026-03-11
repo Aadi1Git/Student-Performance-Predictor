@@ -216,6 +216,12 @@ const App = () => {
           </div>
         </div>
       </div>
+      {/* Footer Section */}
+      <footer className="mt-16 border-t border-slate-700/50 pt-6 pb-4 text-center">
+        <p className="text-slate-400 text-sm tracking-wide">
+          Designed & Built by <span className="text-purple-400 font-semibold">Aaditya Jaysawal</span>
+        </p>
+      </footer>
     </div>
   );
 };
