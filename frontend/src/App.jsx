@@ -217,9 +217,9 @@ const App = () => {
         </div>
       </div>
       {/* Footer Section */}
-      <footer className="mt-16 border-t border-slate-700/50 pt-6 pb-4 text-center">
-        <p className="text-slate-400 text-sm tracking-wide">
-          Designed & Built by <span className="text-purple-400 font-semibold">Aaditya Jaysawal</span>
+      <footer className="col-span-full w-full mt-12 pt-6 pb-8 border-t border-gray-200 dark:border-slate-700/50 text-center">
+        <p className="text-gray-500 dark:text-slate-400 text-sm tracking-wide">
+          Designed & Built by <span className="text-purple-600 dark:text-purple-400 font-semibold">Aaditya Jaysawal</span>
         </p>
       </footer>
     </div>
