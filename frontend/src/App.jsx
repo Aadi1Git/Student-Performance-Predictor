@@ -113,7 +113,6 @@ const App = () => {
     }
   };
 
-  // --- UPDATED SUBMIT HANDLER FOR GEMINI AI ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -123,10 +122,8 @@ const App = () => {
       const response = await axios.post('https://student-performance-predictor-rbqq.onrender.com/predict', formData);
       
       setTimeout(() => {
-        // 1. Set the XGBoost prediction score
         setPrediction(Math.min(100, response.data.predicted_score));
 
-        // 2. Process the dynamic Gemini AI Action Plan
         const rawAiText = response.data.ai_action_plan;
         
         let cleanInsights = [];
@@ -137,12 +134,10 @@ const App = () => {
             .map(line => line.replace(/^-\s*/, '').replace(/^\*\s*/, '').trim());
         }
 
-        // 3. Fallback just in case the AI returns empty
         if (cleanInsights.length === 0) {
           cleanInsights.push("Keep up the fantastic work! Your current habits are setting you up for success.");
         }
 
-        // 4. Update the dashboard state
         setInsights(cleanInsights); 
       }, 500);
 
@@ -164,7 +159,6 @@ const App = () => {
     return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900"><BrainCircuit className="animate-spin text-indigo-500 w-10 h-10" /></div>;
   }
 
-  // 1. If not logged in, show Auth Screen
   if (!isAuthenticated) {
     return (
       <AuthScreen 
@@ -176,8 +170,6 @@ const App = () => {
     );
   }
 
-  // 2. THE GATEKEEPER
-  // If they are logged in, but haven't clicked the email link, lock them out!
   if (currentUser && !currentUser.emailVerified) {
     return (
       <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center
@@ -216,7 +208,6 @@ const App = () => {
     );
   }
 
-  // 3. If they are logged in AND verified, show the Dashboard!
   const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Student';
 
   return (
@@ -339,6 +330,28 @@ const App = () => {
               )}
             </div>
 
+            {/* AI Action Plan - NOW SWAPPED TO BE ABOVE THE GRAPH */}
+            {prediction !== null && (
+              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
+                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <Lightbulb className="text-yellow-500 w-5 h-5" /> AI Action Plan
+                </h3>
+                <ul className="space-y-3">
+                  {insights.map((insight, index) => (
+                    <li 
+                      key={index} 
+                      style={{ animationDelay: `${index * 150}ms` }}
+                      className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up"
+                    >
+                      <span className="text-indigo-500 font-bold mt-0.5">→</span>
+                      {insight}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Student vs Class Average Graph - NOW SWAPPED TO BE BELOW AI PLAN */}
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex-grow">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Student vs Class Average (Scaled %)</h3>
               <div className="h-64 w-full">
@@ -355,21 +368,6 @@ const App = () => {
               </div>
             </div>
 
-            {prediction !== null && (
-              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
-                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
-                  <Lightbulb className="text-yellow-500 w-5 h-5" /> AI Action Plan
-                </h3>
-                <ul className="space-y-3">
-                  {insights.map((insight, index) => (
-                    <li key={index} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50">
-                      <span className="text-indigo-500 font-bold mt-0.5">→</span>
-                      {insight}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
         </div>
         
