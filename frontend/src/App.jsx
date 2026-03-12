@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight, Download } from 'lucide-react';
 
-// NEW: Firebase Imports
+// Firebase Imports
 import { auth } from './firebase';
-import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
+
+// PDF Imports
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const App = () => {
   // --- STATE ---
@@ -15,10 +19,15 @@ const App = () => {
   const [error, setError] = useState('');
   const [insights, setInsights] = useState([]); 
   
+  // PDF State and Ref
+  const reportRef = useRef(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  
   // AUTH STATE
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null); // NEW: Store the actual user details
   const [isLoginView, setIsLoginView] = useState(true);
-  const [authChecking, setAuthChecking] = useState(true); // Prevents flickering on refresh
+  const [authChecking, setAuthChecking] = useState(true); 
 
   const [formData, setFormData] = useState({
     Midterm_Score: 75,
@@ -46,14 +55,10 @@ const App = () => {
     }
   }, [isDarkMode]);
 
-  // NEW: Listen for real Firebase login status
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
+      setIsAuthenticated(!!user);
+      setCurrentUser(user); // NEW: Save the user data so we can check if they are verified
       setAuthChecking(false);
     });
     return () => unsubscribe();
@@ -76,14 +81,45 @@ const App = () => {
     }
   };
 
+  // PDF Generator Function
+  const handleDownloadPDF = async () => {
+    if (!reportRef.current) return;
+    setIsDownloading(true);
+    
+    try {
+      const element = reportRef.current;
+      
+      const canvas = await html2canvas(element, {
+        scale: 2, 
+        backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210; 
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      const pdf = new jsPDF('p', 'mm', [imgWidth, imgHeight]);
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Student';
+      pdf.save(`${userName}_Performance_Report.pdf`);
+    } catch (err) {
+      console.error("Failed to generate PDF", err);
+      alert("There was an issue generating the PDF. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     
     try {
-      // NOTE: Set to localhost for testing. Change to Render URL for production!
-      //const response = await axios.post('http://localhost:8000/predict', formData);
+      // NOTE: Make sure this is pointing to your Render backend!
       const response = await axios.post('https://student-performance-predictor-rbqq.onrender.com/predict', formData);
       
       setTimeout(() => {
@@ -126,12 +162,11 @@ const App = () => {
     { subject: 'Projects (%)', Student: (formData.Projects_Score / 20) * 100, Average: 80 },
   ];
 
-  // Prevent UI flickering while Firebase checks if the user is already logged in
   if (authChecking) {
     return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900"><BrainCircuit className="animate-spin text-indigo-500 w-10 h-10" /></div>;
   }
 
-  // If not logged in, show the Auth Screen
+  // 1. If not logged in, show Auth Screen
   if (!isAuthenticated) {
     return (
       <AuthScreen 
@@ -143,7 +178,50 @@ const App = () => {
     );
   }
 
-  // Otherwise, show the main Dashboard
+  // 2. NEW: THE GATEKEEPER
+  // If they are logged in, but haven't clicked the email link, lock them out!
+  if (currentUser && !currentUser.emailVerified) {
+    return (
+      <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center
+        ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
+        <div className="max-w-md w-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 text-center animate-fade-in-up">
+          
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-yellow-500 rounded-2xl shadow-lg shadow-yellow-500/30 text-white">
+              <Mail size={40} />
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-extrabold text-gray-800 dark:text-white mb-4">Check Your Inbox</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm leading-relaxed">
+            We sent a secure verification link to <br/>
+            <span className="font-bold text-indigo-600 dark:text-indigo-400">{currentUser.email}</span>. <br/><br/>
+            Please click the link in that email to prove you own this address and unlock your Predictor Dashboard.
+          </p>
+          
+          <div className="space-y-4">
+            {/* When they click this, it refreshes the page to check Firebase for the updated verification status */}
+            <button 
+              onClick={() => window.location.reload()} 
+              className="w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+            >
+              I've Verified My Email
+            </button>
+            <button 
+              onClick={handleLogout} 
+              className="w-full py-3.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800 transition-all active:scale-95"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. If they are logged in AND verified, show the Dashboard!
+  const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Student';
+
   return (
     <div className={`min-h-screen transition-colors duration-500 font-sans p-4 sm:p-8 flex items-center justify-center
       ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
@@ -178,6 +256,8 @@ const App = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* LEFT: Input Form */}
           <div className="lg:col-span-7 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
             
@@ -215,11 +295,32 @@ const App = () => {
             </form>
           </div>
 
-          <div className="lg:col-span-5 flex flex-col gap-6">
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 flex flex-col items-center justify-center min-h-[300px]">
-              <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200 mb-6 flex items-center gap-2">
-                <Award className="text-purple-500" /> AI Prediction Engine
-              </h3>
+          {/* RIGHT: Dashboard Results */}
+          <div className="lg:col-span-5 flex flex-col gap-6" ref={reportRef}>
+            
+            <div className="flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-2xl p-5">
+               <div>
+                 <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
+                   <Award className="text-purple-500 w-5 h-5" /> Performance Report
+                 </h3>
+                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1.5 ml-7">
+                   Student: <span className="text-indigo-600 dark:text-indigo-400 font-bold text-sm">{userName}</span>
+                 </p>
+               </div>
+               
+               {prediction !== null && (
+                 <button 
+                   onClick={handleDownloadPDF} 
+                   disabled={isDownloading}
+                   className={`flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded-lg transition-all shadow-md
+                     ${isDownloading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 hover:shadow-indigo-500/30 active:scale-95'}`}
+                 >
+                   {isDownloading ? <span className="animate-pulse">Generating...</span> : <><Download size={14} /> Download PDF</>}
+                 </button>
+               )}
+            </div>
+
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 flex flex-col items-center justify-center min-h-[250px]">
               {prediction !== null ? (
                 <div className="relative flex items-center justify-center animate-fade-in-up">
                   <svg className="w-48 h-48 transform -rotate-90">
@@ -319,12 +420,12 @@ const SliderField = ({ label, name, value, onChange, min, max, isDark }) => (
   </div>
 );
 
-// --- UPDATED: REAL FIREBASE AUTH SCREEN ---
+// --- AUTH SCREEN ---
 const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   
-  // Real controlled inputs
+  const [name, setName] = useState(''); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -335,14 +436,14 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
 
     try {
       if (!isLoginView) {
-        // Creates the real account in Firebase!
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: name });
+        // Sends the email to their inbox immediately
+        await sendEmailVerification(userCredential.user);
       } else {
-        // Logs the user in!
         await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (err) {
-      // Makes Firebase errors easier to read
       let cleanError = err.message;
       if (cleanError.includes('email-already-in-use')) cleanError = 'This email is already registered. Try logging in!';
       if (cleanError.includes('invalid-credential')) cleanError = 'Incorrect email or password. Try again.';
@@ -389,7 +490,8 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
           {!isLoginView && (
             <div className="relative">
               <User className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
-              <input type="text" placeholder="Full Name" 
+              <input type="text" placeholder="Full Name" required
+                value={name} onChange={(e) => setName(e.target.value)}
                 className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
                   ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
             </div>
