@@ -25,7 +25,7 @@ const App = () => {
   
   // AUTH STATE
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // NEW: Store the actual user details
+  const [currentUser, setCurrentUser] = useState(null); 
   const [isLoginView, setIsLoginView] = useState(true);
   const [authChecking, setAuthChecking] = useState(true); 
 
@@ -58,7 +58,7 @@ const App = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
-      setCurrentUser(user); // NEW: Save the user data so we can check if they are verified
+      setCurrentUser(user); 
       setAuthChecking(false);
     });
     return () => unsubscribe();
@@ -113,39 +113,37 @@ const App = () => {
     }
   };
 
+  // --- UPDATED SUBMIT HANDLER FOR GEMINI AI ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     
     try {
-      // NOTE: Make sure this is pointing to your Render backend!
       const response = await axios.post('https://student-performance-predictor-rbqq.onrender.com/predict', formData);
       
       setTimeout(() => {
+        // 1. Set the XGBoost prediction score
         setPrediction(Math.min(100, response.data.predicted_score));
 
-        const newInsights = [];
-        if (formData.Midterm_Score < 75) newInsights.push("Midterm: Review the specific topics you struggled with before finals approach.");
-        if (formData.Assignments_Avg < 8) newInsights.push("Assignments: Start tasks a day earlier to allow time for proofreading and review.");
-        if (formData.Quizzes_Avg < 7) newInsights.push("Quizzes: Review your class notes for just 15 minutes after each lecture to improve retention.");
-        if (formData.Projects_Score < 15) newInsights.push("Projects: Break your next big project into smaller, manageable weekly milestones.");
-        if (formData.Study_Hours_per_Week < 15) newInsights.push("Study Hours: Aim for at least 15-20 hours of self-study per week to master complex topics.");
-        if (formData.Sleep_Hours_per_Night < 6) newInsights.push("Sleep: You are getting less than 6 hours. 7-8 hours drastically improves memory and focus.");
-        if (formData.Participation_Score < 6) newInsights.push("Participation: Active engagement matters. Try asking or answering at least one question per class.");
-        if (formData.Internet_Access === 'No') newInsights.push("Internet: Maximize your time on campus by downloading necessary materials while connected to university Wi-Fi.");
-        if (formData.Attendance < 80) newInsights.push("Attendance: Missing lectures is the #1 cause of score drops. Try to keep attendance above 85%.");
-        if (formData.Stress_Level > 7) newInsights.push("Stress: Your stress is very high. Integrate 10-minute mindfulness breaks or light exercise into your routine.");
-        if (formData.Difficulty_Level === 'High') newInsights.push("Difficulty: This course is tough. Don't hesitate to utilize office hours, TAs, or peer study groups.");
-        if (formData.Family_Income_Level === 'Low') newInsights.push("Resources: Check if your university offers textbook stipends, library reserves, or free tutoring programs.");
-        if (formData.Parent_Education_Level === 'High School') newInsights.push("Guidance: Take full advantage of university academic advising and mentorship programs to navigate college effectively.");
-        if (['CS', 'ECE', 'EEE', 'ME', 'Civil'].includes(formData.Branch)) newInsights.push(`Branch (${formData.Branch}): Engineering fields require practical application. Spend extra time on hands-on labs and coding.`);
-
-        if (newInsights.length === 0) {
-          newInsights.push("Keep up the fantastic work! Your current habits are setting you up for major success.");
+        // 2. Process the dynamic Gemini AI Action Plan
+        const rawAiText = response.data.ai_action_plan;
+        
+        let cleanInsights = [];
+        if (rawAiText) {
+          cleanInsights = rawAiText
+            .split('\n')
+            .filter(line => line.trim().length > 0)
+            .map(line => line.replace(/^-\s*/, '').replace(/^\*\s*/, '').trim());
         }
 
-        setInsights(newInsights.slice(0, 5)); 
+        // 3. Fallback just in case the AI returns empty
+        if (cleanInsights.length === 0) {
+          cleanInsights.push("Keep up the fantastic work! Your current habits are setting you up for success.");
+        }
+
+        // 4. Update the dashboard state
+        setInsights(cleanInsights); 
       }, 500);
 
     } catch (err) {
@@ -178,7 +176,7 @@ const App = () => {
     );
   }
 
-  // 2. NEW: THE GATEKEEPER
+  // 2. THE GATEKEEPER
   // If they are logged in, but haven't clicked the email link, lock them out!
   if (currentUser && !currentUser.emailVerified) {
     return (
@@ -200,7 +198,6 @@ const App = () => {
           </p>
           
           <div className="space-y-4">
-            {/* When they click this, it refreshes the page to check Firebase for the updated verification status */}
             <button 
               onClick={() => window.location.reload()} 
               className="w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
@@ -289,7 +286,7 @@ const App = () => {
               </div>
 
               <button type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
-                {loading ? <span className="animate-pulse">Running XGBoost Model...</span> : <>Predict Future Performance</>}
+                {loading ? <span className="animate-pulse">Running AI Models...</span> : <>Predict Future Performance</>}
               </button>
               {error && <p className="text-red-500 text-center font-medium bg-red-100/50 dark:bg-red-900/30 p-3 rounded-lg">{error}</p>}
             </form>
@@ -438,7 +435,6 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
       if (!isLoginView) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(userCredential.user, { displayName: name });
-        // Sends the email to their inbox immediately
         await sendEmailVerification(userCredential.user);
       } else {
         await signInWithEmailAndPassword(auth, email, password);
