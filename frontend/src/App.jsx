@@ -175,22 +175,31 @@ const App = () => {
       <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center
         ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
         <div className="max-w-md w-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 text-center animate-fade-in-up">
+          
           <div className="flex justify-center mb-6">
             <div className="p-4 bg-yellow-500 rounded-2xl shadow-lg shadow-yellow-500/30 text-white">
               <Mail size={40} />
             </div>
           </div>
+          
           <h2 className="text-2xl font-extrabold text-gray-800 dark:text-white mb-4">Check Your Inbox</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm leading-relaxed">
             We sent a secure verification link to <br/>
             <span className="font-bold text-indigo-600 dark:text-indigo-400">{currentUser.email}</span>. <br/><br/>
             Please click the link in that email to prove you own this address and unlock your Predictor Dashboard.
           </p>
+          
           <div className="space-y-4">
-            <button onClick={() => window.location.reload()} className="w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600">
+            <button 
+              onClick={() => window.location.reload()} 
+              className="w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+            >
               I've Verified My Email
             </button>
-            <button onClick={handleLogout} className="w-full py-3.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600">
+            <button 
+              onClick={handleLogout} 
+              className="w-full py-3.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800 transition-all active:scale-95"
+            >
               Log Out
             </button>
           </div>
@@ -206,21 +215,29 @@ const App = () => {
       ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
       
       <div className="max-w-7xl w-full mx-auto animate-fade-in-up">
-        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30 text-white">
               <BrainCircuit size={28} />
             </div>
-            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-              Student Performance Predictor
-            </h1>
+            <div>
+              <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                Student Performance Predictor
+              </h1>
+            </div>
           </div>
+          
           <div className="flex items-center gap-4">
-            <button onClick={handleLogout} className="px-5 py-2.5 text-sm font-bold rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400">
+            <button 
+              onClick={handleLogout}
+              className="px-5 py-2.5 text-sm font-bold rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-indigo-600 dark:text-indigo-400"
+            >
               Log Out
             </button>
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm text-gray-800 dark:text-gray-200">
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200"
+            >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
           </div>
@@ -228,59 +245,45 @@ const App = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* LEFT COLUMN: Input Form + NEW GRAPH POSITION */}
-          <div className="lg:col-span-7 flex flex-col gap-8">
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
-              <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
-                <Section title="Academic Metrics" isDark={isDarkMode}>
-                  <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} />
-                  <InputField label="Assignments (0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} />
-                  <InputField label="Quizzes (0-10)" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} />
-                  <InputField label="Projects (0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} />
-                </Section>
-                <Section title="Habits & Engagement" isDark={isDarkMode}>
-                  <InputField label="Study Hrs (0-70)" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} />
-                  <InputField label="Sleep Hrs/Nt" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} />
-                  <InputField label="Participation (0-10)" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} />
-                  <SelectField label="Internet" name="Internet_Access" value={formData.Internet_Access} onChange={handleChange} isDark={isDarkMode} options={['Yes', 'No']} />
-                </Section>
-                <Section title="Demographics" isDark={isDarkMode}>
-                  <SelectField label="Branch" name="Branch" value={formData.Branch} onChange={handleChange} isDark={isDarkMode} options={['Civil', 'ECE', 'EEE', 'ME', 'CS', 'Other']} />
-                  <SelectField label="Difficulty" name="Difficulty_Level" value={formData.Difficulty_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
-                  <SelectField label="Education" name="Parent_Education_Level" value={formData.Parent_Education_Level} onChange={handleChange} isDark={isDarkMode} options={['High School', 'College', 'Postgraduate']} />
-                  <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
-                </Section>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                  <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
-                  <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
-                </div>
-                <button type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
-                  {loading ? <span className="animate-pulse">Running AI Models...</span> : <>Predict Future Performance</>}
-                </button>
-                {error && <p className="text-red-500 text-center font-medium bg-red-100/50 dark:bg-red-900/30 p-3 rounded-lg">{error}</p>}
-              </form>
-            </div>
+          {/* LEFT: Input Form */}
+          <div className="lg:col-span-7 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
+            
+            <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+              <Section title="Academic Metrics" isDark={isDarkMode}>
+                <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
+                <InputField label="Assignments (0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                <InputField label="Quizzes (0-10)" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                <InputField label="Projects (0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
+              </Section>
 
-            {/* GRAPH - NOW MOVED HERE (Under the button) */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Student vs Class Average (Scaled %)</h3>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <Tooltip cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
-                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }}/>
-                    <Bar dataKey="Student" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Average" fill={isDarkMode ? '#475569' : '#cbd5e1'} radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+              <Section title="Habits & Engagement" isDark={isDarkMode}>
+                <InputField label="Study Hrs (0-70)" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
+                <InputField label="Sleep Hrs/Nt" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} min={0} max={24} />
+                <InputField label="Participation (0-10)" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                <SelectField label="Internet" name="Internet_Access" value={formData.Internet_Access} onChange={handleChange} isDark={isDarkMode} options={['Yes', 'No']} />
+              </Section>
+
+              <Section title="Demographics" isDark={isDarkMode}>
+                <SelectField label="Branch" name="Branch" value={formData.Branch} onChange={handleChange} isDark={isDarkMode} options={['Civil', 'ECE', 'EEE', 'ME', 'CS', 'Other']} />
+                <SelectField label="Difficulty" name="Difficulty_Level" value={formData.Difficulty_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
+                <SelectField label="Education" name="Parent_Education_Level" value={formData.Parent_Education_Level} onChange={handleChange} isDark={isDarkMode} options={['High School', 'College', 'Postgraduate']} />
+                <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
+              </Section>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
+                <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
               </div>
-            </div>
+
+              <button type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
+                {loading ? <span className="animate-pulse">Running AI Models...</span> : <>Predict Future Performance</>}
+              </button>
+              {error && <p className="text-red-500 text-center font-medium bg-red-100/50 dark:bg-red-900/30 p-3 rounded-lg">{error}</p>}
+            </form>
           </div>
 
-          {/* RIGHT COLUMN: Results + AI Action Plan */}
+          {/* RIGHT: Dashboard Results */}
           <div className="lg:col-span-5 flex flex-col gap-6" ref={reportRef}>
             
             <div className="flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-2xl p-5">
@@ -294,7 +297,12 @@ const App = () => {
                </div>
                
                {prediction !== null && (
-                 <button onClick={handleDownloadPDF} disabled={isDownloading} className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded-lg transition-all shadow-md bg-indigo-600 hover:bg-indigo-500 active:scale-95">
+                 <button 
+                   onClick={handleDownloadPDF} 
+                   disabled={isDownloading}
+                   className={`flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded-lg transition-all shadow-md
+                     ${isDownloading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 hover:shadow-indigo-500/30 active:scale-95'}`}
+                 >
                    {isDownloading ? <span className="animate-pulse">Generating...</span> : <><Download size={14} /> Download PDF</>}
                  </button>
                )}
@@ -322,7 +330,7 @@ const App = () => {
               )}
             </div>
 
-            {/* AI Action Plan */}
+            {/* AI Action Plan - NOW SWAPPED TO BE ABOVE THE GRAPH */}
             {prediction !== null && (
               <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
                 <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
@@ -342,6 +350,24 @@ const App = () => {
                 </ul>
               </div>
             )}
+
+            {/* Student vs Class Average Graph - NOW SWAPPED TO BE BELOW AI PLAN */}
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex-grow">
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Student vs Class Average (Scaled %)</h3>
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                    <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <Tooltip cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }}/>
+                    <Bar dataKey="Student" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Average" fill={isDarkMode ? '#475569' : '#cbd5e1'} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
           </div>
         </div>
         
@@ -357,23 +383,23 @@ const App = () => {
 
 // --- REUSABLE COMPONENTS ---
 const Section = ({ title, children, isDark }) => (
-  <div className="mb-6 last:mb-0">
+  <div>
     <h3 className={`text-sm font-bold uppercase tracking-widest mb-4 pb-2 border-b ${isDark ? 'text-indigo-400 border-slate-700' : 'text-indigo-600 border-indigo-100'}`}>{title}</h3>
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{children}</div>
   </div>
 );
 
-const InputField = ({ label, name, value, onChange, isDark }) => (
+const InputField = ({ label, name, value, onChange, isDark, min, max }) => (
   <div className="flex flex-col">
     <label className={`text-xs font-semibold mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{label}</label>
-    <input type="number" name={name} value={value} onChange={onChange} className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm ${isDark ? 'bg-slate-800/50 border-slate-600 text-white focus:border-indigo-500' : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`} />
+    <input type="number" name={name} value={value} onChange={onChange} min={min} max={max} className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`} />
   </div>
 );
 
 const SelectField = ({ label, name, value, onChange, options, isDark }) => (
   <div className="flex flex-col">
     <label className={`text-xs font-semibold mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{label}</label>
-    <select name={name} value={value} onChange={onChange} className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer ${isDark ? 'bg-slate-800/50 border-slate-600 text-white focus:border-indigo-500' : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`}>
+    <select name={name} value={value} onChange={onChange} className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm appearance-none cursor-pointer ${isDark ? 'bg-slate-800/50 border-slate-600 text-white focus:border-indigo-500' : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`}>
       {options.map(opt => <option key={opt} value={opt} className={isDark ? "bg-slate-800" : ""}>{opt}</option>)}
     </select>
   </div>
@@ -389,9 +415,11 @@ const SliderField = ({ label, name, value, onChange, min, max, isDark }) => (
   </div>
 );
 
+// --- AUTH SCREEN ---
 const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+  
   const [name, setName] = useState(''); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -400,6 +428,7 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
     e.preventDefault();
     setAuthLoading(true);
     setAuthError('');
+
     try {
       if (!isLoginView) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -409,26 +438,88 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
         await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (err) {
-      setAuthError(err.message);
+      let cleanError = err.message;
+      if (cleanError.includes('email-already-in-use')) cleanError = 'This email is already registered. Try logging in!';
+      if (cleanError.includes('invalid-credential')) cleanError = 'Incorrect email or password. Try again.';
+      if (cleanError.includes('weak-password')) cleanError = 'Password must be at least 6 characters.';
+      setAuthError(cleanError);
     } finally {
       setAuthLoading(false);
     }
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center ${isDark ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
+    <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center
+      ${isDark ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
+      
+      <div className="absolute top-6 right-6">
+        <button onClick={toggleTheme} className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200">
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+      </div>
+
       <div className="w-full max-w-md bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 relative overflow-hidden animate-fade-in-up">
-        <h2 className="text-3xl font-extrabold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">{isLoginView ? 'Welcome Back' : 'Create Account'}</h2>
-        {authError && <div className="mb-4 p-3 bg-red-100/50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl text-center text-sm font-semibold text-red-600 dark:text-red-400">{authError}</div>}
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
+        
+        <div className="flex justify-center mb-6">
+          <div className="p-4 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/30 text-white">
+            <BrainCircuit size={40} />
+          </div>
+        </div>
+        
+        <h2 className="text-3xl font-extrabold text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+          {isLoginView ? 'Welcome Back' : 'Create Account'}
+        </h2>
+        <p className="text-center text-gray-500 dark:text-gray-400 mb-6 text-sm">
+          {isLoginView ? 'Enter your details to access the Predictor.' : 'Sign up to analyze student performance.'}
+        </p>
+
+        {authError && (
+          <div className="mb-4 p-3 bg-red-100/50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl text-center text-sm font-semibold text-red-600 dark:text-red-400">
+            {authError}
+          </div>
+        )}
+
         <form onSubmit={handleAuthSubmit} className="space-y-5">
-          {!isLoginView && <input type="text" placeholder="Full Name" required value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 rounded-xl border outline-none dark:bg-slate-800 dark:text-white" />}
-          <input type="email" placeholder="Email Address" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-3 rounded-xl border outline-none dark:bg-slate-800 dark:text-white" />
-          <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 rounded-xl border outline-none dark:bg-slate-800 dark:text-white" />
-          <button type="submit" disabled={authLoading} className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-95 transition-all">{isLoginView ? 'Sign In' : 'Sign Up'}</button>
+          {!isLoginView && (
+            <div className="relative">
+              <User className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+              <input type="text" placeholder="Full Name" required
+                value={name} onChange={(e) => setName(e.target.value)}
+                className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
+                  ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+            </div>
+          )}
+          
+          <div className="relative">
+            <Mail className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+            <input type="email" placeholder="Email Address" required
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
+                ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+          </div>
+
+          <div className="relative">
+            <Lock className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+            <input type="password" placeholder="Password" required
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
+                ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+          </div>
+
+          <button type="submit" disabled={authLoading}
+            className={`w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all flex justify-center items-center gap-2 mt-2
+              ${authLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-95'}`}
+          >
+            {authLoading ? <span className="animate-pulse">Loading...</span> : <>{isLoginView ? 'Sign In' : 'Sign Up'} <ArrowRight size={18} /></>}
+          </button>
         </form>
+
         <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           {isLoginView ? "Don't have an account? " : "Already have an account? "}
-          <button type="button" onClick={() => setIsLoginView(!isLoginView)} className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">{isLoginView ? 'Sign up' : 'Log in'}</button>
+          <button type="button" onClick={() => { setIsLoginView(!isLoginView); setAuthError(''); }} className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+            {isLoginView ? 'Sign up' : 'Log in'}
+          </button>
         </div>
       </div>
     </div>
