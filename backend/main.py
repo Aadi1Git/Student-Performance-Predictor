@@ -141,7 +141,7 @@ def predict_performance(data: StudentInput):
                         {"role": "system", "content": "You are an expert academic advisor."},
                         {"role": "user", "content": prompt}
                     ],
-                    model="llama3-8b-8192", 
+                    model="llama-3.1-8b-instant",
                     temperature=0.5,
                 )
                 real_ai_plan = chat_completion.choices[0].message.content
