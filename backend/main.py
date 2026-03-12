@@ -6,6 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import os
 
+# --- NEW: AI Imports ---
+from dotenv import load_dotenv
+import google.generativeai as genai
+
 app = FastAPI()
 
 app.add_middleware(
@@ -15,6 +19,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- NEW: AI Setup ---
+# Load the secret keys from your .env file
+load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Initialize the Gemini Model safely
+ai_model = None
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    ai_model = genai.GenerativeModel('gemini-1.5-flash')
+    print("✅ Gemini AI configured successfully.")
+else:
+    print("⚠️ Warning: GEMINI_API_KEY not found in .env file.")
+
 
 # --- Load Model ---
 MODEL_PATH = "model.pkl"
@@ -60,10 +79,7 @@ def predict_performance(data: StudentInput):
     
     try:
         # --- DATA PREPARATION ---
-        # We must manually encode the strings into the numbers the model expects
-        
         # 1. Handle One-Hot Encoding for Branch
-        # The model expects specific columns: Branch_Civil, Branch_ECE, etc.
         branch_civil = 1 if data.Branch == 'Civil' else 0
         branch_ece = 1 if data.Branch == 'ECE' else 0
         branch_eee = 1 if data.Branch == 'EEE' else 0
@@ -72,26 +88,20 @@ def predict_performance(data: StudentInput):
         # 2. Handle Internet Access
         internet_yes = 1 if data.Internet_Access == 'Yes' else 0
 
-        # 3. Handle Label Encoding (Mapping Text to Numbers)
-        # Note: I am assuming standard mappings. If predictions are weird, these numbers might need swapping.
-        
-        # Difficulty: Low->0, Medium->1, High->2
+        # 3. Handle Label Encoding
         diff_map = {'Low': 0, 'Medium': 1, 'High': 2}
         difficulty_val = diff_map.get(data.Difficulty_Level, 1)
 
-        # Parent Education: High School->0, College->1, Postgrad->2
         edu_map = {'High School': 0, 'College': 1, 'Postgraduate': 2}
         parent_edu_val = edu_map.get(data.Parent_Education_Level, 1)
 
-        # Income: Low->0, Medium->1, High->2
         income_map = {'Low': 0, 'Medium': 1, 'High': 2}
         income_val = income_map.get(data.Family_Income_Level, 1)
 
         # --- CREATE DATAFRAME ---
-        # The keys here MUST match the "Expected" list from your error log exactly.
         input_dict = {
             'Difficulty_Level': [difficulty_val],
-            'Attendance (%)': [data.Attendance],  # Note the exact spelling from error log
+            'Attendance (%)': [data.Attendance], 
             'Midterm_Score': [data.Midterm_Score],
             'Assignments_Avg': [data.Assignments_Avg],
             'Quizzes_Avg': [data.Quizzes_Avg],
@@ -111,13 +121,50 @@ def predict_performance(data: StudentInput):
         
         df = pd.DataFrame(input_dict)
         
-        # --- PREDICT ---
-        prediction = model.predict(df)
-        return {"predicted_score": float(prediction[0])}
+        # --- 1. PREDICT SCORE (XGBoost) ---
+        prediction_array = model.predict(df)
+        final_score = float(prediction_array[0])
+
+        # --- 2. GENERATE AI ACTION PLAN (Gemini) ---
+        real_ai_plan = ""
+        
+        if ai_model:
+            # Tell Gemini exactly what the student's data is
+            prompt = f"""
+            You are an expert academic advisor. A student in the {data.Branch} branch has these metrics:
+            - Midterm Score: {data.Midterm_Score}/100
+            - Assignments: {data.Assignments_Avg}/10
+            - Quizzes: {data.Quizzes_Avg}/10
+            - Projects: {data.Projects_Score}/20
+            - Study Hours/Week: {data.Study_Hours_per_Week}
+            - Attendance: {data.Attendance}%
+            - Sleep Hours: {data.Sleep_Hours_per_Night}
+            - Stress Level: {data.Stress_Level}/10
+            
+            Their XGBoost predicted final score is {round(final_score, 1)}/100.
+            
+            Identify their top weakest areas based ONLY on this data. Write exactly 3 short, actionable bullet points advising them on how to turn those specific weak areas into strong areas. 
+            Do not use introductory text. Just provide the 3 bullet points starting with a dash (-).
+            """
+            
+            try:
+                ai_response = ai_model.generate_content(prompt)
+                real_ai_plan = ai_response.text
+            except Exception as e:
+                print(f"❌ Gemini generation error: {e}")
+                real_ai_plan = "- Focus on maintaining consistent study hours.\n- Review your weakest topics.\n- Keep your attendance high."
+        else:
+            real_ai_plan = "- AI Advisor is currently offline. Please check back later."
+
+        # --- 3. RETURN BOTH ---
+        return {
+            "predicted_score": final_score,
+            "ai_action_plan": real_ai_plan
+        }
 
     except Exception as e:
         import traceback
-        traceback.print_exc() # Print full error to terminal
+        traceback.print_exc() 
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
