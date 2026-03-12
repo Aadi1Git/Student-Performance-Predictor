@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Moon, Sun, Award, BrainCircuit } from 'lucide-react';
+import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight } from 'lucide-react';
+
+// NEW: Firebase Imports
+import { auth } from './firebase';
+import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 const App = () => {
   // --- STATE ---
@@ -9,18 +13,23 @@ const App = () => {
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [insights, setInsights] = useState([]); 
+  
+  // AUTH STATE
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoginView, setIsLoginView] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true); // Prevents flickering on refresh
 
-  // UPDATED: Default values adjusted to fit within your new limits
   const [formData, setFormData] = useState({
     Midterm_Score: 75,
-    Assignments_Avg: 8,      // Scaled down (Max 10)
-    Quizzes_Avg: 7,          // Scaled down (Max 10)
-    Projects_Score: 16,      // Scaled down (Max 20)
-    Study_Hours_per_Week: 15,// Scaled down (Max 70)
+    Assignments_Avg: 8,
+    Quizzes_Avg: 7,
+    Projects_Score: 16,
+    Study_Hours_per_Week: 15,
     Attendance: 90,
     Sleep_Hours_per_Night: 7,
-    Stress_Level: 5,         // Now out of 10
-    Participation_Score: 8,  // Scaled down (Max 10)
+    Stress_Level: 5,
+    Participation_Score: 8,
     Branch: 'CS',
     Difficulty_Level: 'Medium',
     Parent_Education_Level: 'College',
@@ -28,7 +37,7 @@ const App = () => {
     Internet_Access: 'Yes'
   });
 
-  // --- DARK MODE TOGGLE ---
+  // --- DARK MODE & FIREBASE AUTH LISTENER ---
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -36,6 +45,19 @@ const App = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  // NEW: Listen for real Firebase login status
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+      setAuthChecking(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // --- HANDLERS ---
   const handleChange = (e) => {
@@ -46,15 +68,50 @@ const App = () => {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     
     try {
+      // NOTE: Set to localhost for testing. Change to Render URL for production!
+      //const response = await axios.post('http://localhost:8000/predict', formData);
       const response = await axios.post('https://student-performance-predictor-rbqq.onrender.com/predict', formData);
-      // This ensures the score never goes above 100
-    setTimeout(() => setPrediction(Math.min(100, response.data.predicted_score)), 500);
+      
+      setTimeout(() => {
+        setPrediction(Math.min(100, response.data.predicted_score));
+
+        const newInsights = [];
+        if (formData.Midterm_Score < 75) newInsights.push("Midterm: Review the specific topics you struggled with before finals approach.");
+        if (formData.Assignments_Avg < 8) newInsights.push("Assignments: Start tasks a day earlier to allow time for proofreading and review.");
+        if (formData.Quizzes_Avg < 7) newInsights.push("Quizzes: Review your class notes for just 15 minutes after each lecture to improve retention.");
+        if (formData.Projects_Score < 15) newInsights.push("Projects: Break your next big project into smaller, manageable weekly milestones.");
+        if (formData.Study_Hours_per_Week < 15) newInsights.push("Study Hours: Aim for at least 15-20 hours of self-study per week to master complex topics.");
+        if (formData.Sleep_Hours_per_Night < 6) newInsights.push("Sleep: You are getting less than 6 hours. 7-8 hours drastically improves memory and focus.");
+        if (formData.Participation_Score < 6) newInsights.push("Participation: Active engagement matters. Try asking or answering at least one question per class.");
+        if (formData.Internet_Access === 'No') newInsights.push("Internet: Maximize your time on campus by downloading necessary materials while connected to university Wi-Fi.");
+        if (formData.Attendance < 80) newInsights.push("Attendance: Missing lectures is the #1 cause of score drops. Try to keep attendance above 85%.");
+        if (formData.Stress_Level > 7) newInsights.push("Stress: Your stress is very high. Integrate 10-minute mindfulness breaks or light exercise into your routine.");
+        if (formData.Difficulty_Level === 'High') newInsights.push("Difficulty: This course is tough. Don't hesitate to utilize office hours, TAs, or peer study groups.");
+        if (formData.Family_Income_Level === 'Low') newInsights.push("Resources: Check if your university offers textbook stipends, library reserves, or free tutoring programs.");
+        if (formData.Parent_Education_Level === 'High School') newInsights.push("Guidance: Take full advantage of university academic advising and mentorship programs to navigate college effectively.");
+        if (['CS', 'ECE', 'EEE', 'ME', 'Civil'].includes(formData.Branch)) newInsights.push(`Branch (${formData.Branch}): Engineering fields require practical application. Spend extra time on hands-on labs and coding.`);
+
+        if (newInsights.length === 0) {
+          newInsights.push("Keep up the fantastic work! Your current habits are setting you up for major success.");
+        }
+
+        setInsights(newInsights.slice(0, 5)); 
+      }, 500);
+
     } catch (err) {
       setError('Error: ' + (err.response?.data?.detail || err.message));
     } finally {
@@ -62,9 +119,6 @@ const App = () => {
     }
   };
 
-  // --- CHART DATA ---
-  // UPDATED: To make the chart look proportional, we scale all scores to percentages (0-100) 
-  // just for the visual display. The model still gets the raw numbers.
   const chartData = [
     { subject: 'Midterm', Student: formData.Midterm_Score, Average: 72 },
     { subject: 'Assign (%)', Student: formData.Assignments_Avg * 10, Average: 75 },
@@ -72,13 +126,29 @@ const App = () => {
     { subject: 'Projects (%)', Student: (formData.Projects_Score / 20) * 100, Average: 80 },
   ];
 
+  // Prevent UI flickering while Firebase checks if the user is already logged in
+  if (authChecking) {
+    return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900"><BrainCircuit className="animate-spin text-indigo-500 w-10 h-10" /></div>;
+  }
+
+  // If not logged in, show the Auth Screen
+  if (!isAuthenticated) {
+    return (
+      <AuthScreen 
+        isLoginView={isLoginView} 
+        setIsLoginView={setIsLoginView} 
+        isDark={isDarkMode}
+        toggleTheme={() => setIsDarkMode(!isDarkMode)}
+      />
+    );
+  }
+
+  // Otherwise, show the main Dashboard
   return (
     <div className={`min-h-screen transition-colors duration-500 font-sans p-4 sm:p-8 flex items-center justify-center
       ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
       
-      <div className="max-w-7xl w-full mx-auto">
-        
-        {/* Header Section */}
+      <div className="max-w-7xl w-full mx-auto animate-fade-in-up">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30 text-white">
@@ -88,28 +158,30 @@ const App = () => {
               <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
                 Student Performance Predictor
               </h1>
-              {/* <p className="text-sm font-medium text-gray-500 dark:text-gray-400"></p> */}
             </div>
           </div>
           
-          <button 
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200"
-          >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={handleLogout}
+              className="px-5 py-2.5 text-sm font-bold rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-indigo-600 dark:text-indigo-400"
+            >
+              Log Out
+            </button>
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+          </div>
         </div>
 
-        {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* LEFT: Form Section */}
           <div className="lg:col-span-7 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
             
             <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
-              
-              {/* UPDATED: Added min/max props and updated labels */}
               <Section title="Academic Metrics" isDark={isDarkMode}>
                 <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
                 <InputField label="Assignments (0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
@@ -133,52 +205,29 @@ const App = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                 <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
-                {/* UPDATED: Stress range set from 0 to 10 */}
                 <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
               </div>
 
-              <button 
-                type="submit" 
-                disabled={loading} 
-                className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2
-                  ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}
-              >
-                {loading ? (
-                  <span className="animate-pulse">Running XGBoost Model...</span>
-                ) : (
-                  <>Predict Future Performance</>
-                )}
+              <button type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
+                {loading ? <span className="animate-pulse">Running XGBoost Model...</span> : <>Predict Future Performance</>}
               </button>
-              
               {error && <p className="text-red-500 text-center font-medium bg-red-100/50 dark:bg-red-900/30 p-3 rounded-lg">{error}</p>}
             </form>
           </div>
 
-          {/* RIGHT: Dashboard Results Section */}
           <div className="lg:col-span-5 flex flex-col gap-6">
-            
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 flex flex-col items-center justify-center min-h-[300px]">
               <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200 mb-6 flex items-center gap-2">
                 <Award className="text-purple-500" /> AI Prediction Engine
               </h3>
-              
               {prediction !== null ? (
                 <div className="relative flex items-center justify-center animate-fade-in-up">
                   <svg className="w-48 h-48 transform -rotate-90">
-                    <circle cx="96" cy="96" r="85" stroke="currentColor" strokeWidth="12" fill="transparent" 
-                      className="text-gray-200 dark:text-slate-700" />
-                    <circle cx="96" cy="96" r="85" stroke="currentColor" strokeWidth="12" fill="transparent"
-                      strokeDasharray="534" 
-                      strokeDashoffset={534 - (prediction / 100) * 534}
-                      strokeLinecap="round"
-                      className={`transition-all duration-1500 ease-out 
-                        ${prediction >= 80 ? 'text-green-500' : prediction >= 60 ? 'text-yellow-500' : 'text-red-500'}`} 
-                    />
+                    <circle cx="96" cy="96" r="85" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-gray-200 dark:text-slate-700" />
+                    <circle cx="96" cy="96" r="85" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="534" strokeDashoffset={534 - (prediction / 100) * 534} strokeLinecap="round" className={`transition-all duration-1500 ease-out ${prediction >= 80 ? 'text-green-500' : prediction >= 60 ? 'text-yellow-500' : 'text-red-500'}`} />
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-5xl font-extrabold text-gray-900 dark:text-white">
-                      {prediction.toFixed(1)}
-                    </span>
+                    <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{prediction.toFixed(1)}</span>
                     <span className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">out of 100</span>
                   </div>
                 </div>
@@ -193,18 +242,13 @@ const App = () => {
             </div>
 
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex-grow">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
-                Student vs Class Average (Scaled %)
-              </h3>
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Student vs Class Average (Scaled %)</h3>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                     <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <Tooltip 
-                      cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}
-                      contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                    />
+                    <Tooltip cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }}/>
                     <Bar dataKey="Student" fill="#6366f1" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="Average" fill={isDarkMode ? '#475569' : '#cbd5e1'} radius={[4, 4, 0, 0]} />
@@ -213,26 +257,38 @@ const App = () => {
               </div>
             </div>
 
+            {prediction !== null && (
+              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
+                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <Lightbulb className="text-yellow-500 w-5 h-5" /> AI Action Plan
+                </h3>
+                <ul className="space-y-3">
+                  {insights.map((insight, index) => (
+                    <li key={index} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50">
+                      <span className="text-indigo-500 font-bold mt-0.5">→</span>
+                      {insight}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
-          {/* Footer Section */}
-      <footer className="col-span-full w-full mt-12 pt-6 pb-8 border-t border-gray-200 dark:border-slate-700/50 text-center">
-        <p className="text-gray-500 dark:text-slate-400 text-sm tracking-wide">
-          Designed & Built by <span className="text-purple-600 dark:text-purple-400 font-semibold">Aaditya Jaysawal</span>
-        </p>
-      </footer>
+        
+        <footer className="col-span-full w-full mt-12 pt-6 pb-8 border-t border-gray-200 dark:border-slate-700/50 text-center">
+          <p className="text-gray-500 dark:text-slate-400 text-sm tracking-wide">
+            Designed & Built by <span className="text-purple-600 dark:text-purple-400 font-semibold">Aaditya Jaysawal</span>
+          </p>
+        </footer>
       </div>
     </div>
   );
 };
 
 // --- REUSABLE COMPONENTS ---
-// UPDATED: InputField now accepts min and max properties to enforce the limits
 const Section = ({ title, children, isDark }) => (
   <div>
-    <h3 className={`text-sm font-bold uppercase tracking-widest mb-4 pb-2 border-b ${isDark ? 'text-indigo-400 border-slate-700' : 'text-indigo-600 border-indigo-100'}`}>
-      {title}
-    </h3>
+    <h3 className={`text-sm font-bold uppercase tracking-widest mb-4 pb-2 border-b ${isDark ? 'text-indigo-400 border-slate-700' : 'text-indigo-600 border-indigo-100'}`}>{title}</h3>
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{children}</div>
   </div>
 );
@@ -240,25 +296,14 @@ const Section = ({ title, children, isDark }) => (
 const InputField = ({ label, name, value, onChange, isDark, min, max }) => (
   <div className="flex flex-col">
     <label className={`text-xs font-semibold mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{label}</label>
-    <input 
-      type="number" name={name} value={value} onChange={onChange} 
-      min={min} max={max}
-      className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
-        ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500 focus:border-indigo-500' 
-                 : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`} 
-    />
+    <input type="number" name={name} value={value} onChange={onChange} min={min} max={max} className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`} />
   </div>
 );
 
 const SelectField = ({ label, name, value, onChange, options, isDark }) => (
   <div className="flex flex-col">
     <label className={`text-xs font-semibold mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{label}</label>
-    <select 
-      name={name} value={value} onChange={onChange} 
-      className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm appearance-none cursor-pointer
-        ${isDark ? 'bg-slate-800/50 border-slate-600 text-white focus:border-indigo-500' 
-                 : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`}
-    >
+    <select name={name} value={value} onChange={onChange} className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm appearance-none cursor-pointer ${isDark ? 'bg-slate-800/50 border-slate-600 text-white focus:border-indigo-500' : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`}>
       {options.map(opt => <option key={opt} value={opt} className={isDark ? "bg-slate-800" : ""}>{opt}</option>)}
     </select>
   </div>
@@ -268,15 +313,121 @@ const SliderField = ({ label, name, value, onChange, min, max, isDark }) => (
   <div className="flex flex-col">
     <div className="flex justify-between items-center mb-2">
       <label className={`text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{label}</label>
-      <span className={`px-2 py-1 rounded-md text-xs font-bold ${isDark ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-100 text-indigo-700'}`}>
-        {value}
-      </span>
+      <span className={`px-2 py-1 rounded-md text-xs font-bold ${isDark ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-100 text-indigo-700'}`}>{value}</span>
     </div>
-    <input 
-      type="range" name={name} min={min} max={max} value={value} onChange={onChange} 
-      className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-indigo-500 bg-gray-200 dark:bg-slate-700" 
-    />
+    <input type="range" name={name} min={min} max={max} value={value} onChange={onChange} className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-indigo-500 bg-gray-200 dark:bg-slate-700" />
   </div>
 );
+
+// --- UPDATED: REAL FIREBASE AUTH SCREEN ---
+const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  
+  // Real controlled inputs
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+
+    try {
+      if (!isLoginView) {
+        // Creates the real account in Firebase!
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        // Logs the user in!
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+    } catch (err) {
+      // Makes Firebase errors easier to read
+      let cleanError = err.message;
+      if (cleanError.includes('email-already-in-use')) cleanError = 'This email is already registered. Try logging in!';
+      if (cleanError.includes('invalid-credential')) cleanError = 'Incorrect email or password. Try again.';
+      if (cleanError.includes('weak-password')) cleanError = 'Password must be at least 6 characters.';
+      setAuthError(cleanError);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  return (
+    <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center
+      ${isDark ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
+      
+      <div className="absolute top-6 right-6">
+        <button onClick={toggleTheme} className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200">
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+      </div>
+
+      <div className="w-full max-w-md bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 relative overflow-hidden animate-fade-in-up">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
+        
+        <div className="flex justify-center mb-6">
+          <div className="p-4 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/30 text-white">
+            <BrainCircuit size={40} />
+          </div>
+        </div>
+        
+        <h2 className="text-3xl font-extrabold text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+          {isLoginView ? 'Welcome Back' : 'Create Account'}
+        </h2>
+        <p className="text-center text-gray-500 dark:text-gray-400 mb-6 text-sm">
+          {isLoginView ? 'Enter your details to access the Predictor.' : 'Sign up to analyze student performance.'}
+        </p>
+
+        {authError && (
+          <div className="mb-4 p-3 bg-red-100/50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl text-center text-sm font-semibold text-red-600 dark:text-red-400">
+            {authError}
+          </div>
+        )}
+
+        <form onSubmit={handleAuthSubmit} className="space-y-5">
+          {!isLoginView && (
+            <div className="relative">
+              <User className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+              <input type="text" placeholder="Full Name" 
+                className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
+                  ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+            </div>
+          )}
+          
+          <div className="relative">
+            <Mail className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+            <input type="email" placeholder="Email Address" required
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
+                ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+          </div>
+
+          <div className="relative">
+            <Lock className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+            <input type="password" placeholder="Password" required
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
+                ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+          </div>
+
+          <button type="submit" disabled={authLoading}
+            className={`w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all flex justify-center items-center gap-2 mt-2
+              ${authLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-95'}`}
+          >
+            {authLoading ? <span className="animate-pulse">Loading...</span> : <>{isLoginView ? 'Sign In' : 'Sign Up'} <ArrowRight size={18} /></>}
+          </button>
+        </form>
+
+        <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+          {isLoginView ? "Don't have an account? " : "Already have an account? "}
+          <button type="button" onClick={() => { setIsLoginView(!isLoginView); setAuthError(''); }} className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+            {isLoginView ? 'Sign up' : 'Log in'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default App;
