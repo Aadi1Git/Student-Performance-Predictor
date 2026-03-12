@@ -3,12 +3,11 @@ import pandas as pd
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 import os
 
-# --- NEW: AI Imports ---
 from dotenv import load_dotenv
-import google.generativeai as genai
+from groq import Groq
 
 app = FastAPI()
 
@@ -20,20 +19,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- NEW: AI Setup ---
-# Load the secret keys from your .env file
+# --- AI Setup (Using Groq instead of Google) ---
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# Initialize the Gemini Model safely
-ai_model = None
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    ai_model = genai.GenerativeModel('gemini-pro')
-    print("✅ Gemini AI configured successfully.")
+groq_client = None
+if GROQ_API_KEY:
+    groq_client = Groq(api_key=GROQ_API_KEY)
+    print("✅ Groq AI configured successfully.")
 else:
-    print("⚠️ Warning: GEMINI_API_KEY not found in .env file.")
-
+    print("⚠️ Warning: GROQ_API_KEY not found in .env file.")
 
 # --- Load Model ---
 MODEL_PATH = "model.pkl"
@@ -46,31 +41,28 @@ def load_model():
         if os.path.exists(MODEL_PATH):
             with open(MODEL_PATH, "rb") as f:
                 model = pickle.load(f)
-            print("✅ Model loaded successfully.")
+            print("✅ XGBoost Model loaded successfully.")
         else:
             print("⚠️ Warning: model.pkl not found.")
     except Exception as e:
         print(f"❌ Error loading model: {e}")
 
 # --- Input Schema ---
-# Matches the user inputs we need from the Frontend
 class StudentInput(BaseModel):
     Midterm_Score: float
     Assignments_Avg: float
     Quizzes_Avg: float
     Projects_Score: float
     Study_Hours_per_Week: float
-    Attendance: float # This will be mapped to 'Attendance (%)'
+    Attendance: float
     Sleep_Hours_per_Night: float
     Stress_Level: int
     Participation_Score: float
-    
-    # New Categorical Inputs
-    Branch: str  # Civil, ECE, EEE, ME, Other
-    Difficulty_Level: str # Low, Medium, High
-    Parent_Education_Level: str # High School, College, Postgraduate
-    Family_Income_Level: str # Low, Medium, High
-    Internet_Access: str # Yes, No
+    Branch: str
+    Difficulty_Level: str
+    Parent_Education_Level: str
+    Family_Income_Level: str
+    Internet_Access: str
 
 @app.post("/predict")
 def predict_performance(data: StudentInput):
@@ -79,16 +71,13 @@ def predict_performance(data: StudentInput):
     
     try:
         # --- DATA PREPARATION ---
-        # 1. Handle One-Hot Encoding for Branch
         branch_civil = 1 if data.Branch == 'Civil' else 0
         branch_ece = 1 if data.Branch == 'ECE' else 0
         branch_eee = 1 if data.Branch == 'EEE' else 0
         branch_me = 1 if data.Branch == 'ME' else 0
         
-        # 2. Handle Internet Access
         internet_yes = 1 if data.Internet_Access == 'Yes' else 0
 
-        # 3. Handle Label Encoding
         diff_map = {'Low': 0, 'Medium': 1, 'High': 2}
         difficulty_val = diff_map.get(data.Difficulty_Level, 1)
 
@@ -125,13 +114,12 @@ def predict_performance(data: StudentInput):
         prediction_array = model.predict(df)
         final_score = float(prediction_array[0])
 
-        # --- 2. GENERATE AI ACTION PLAN (Gemini) ---
+        # --- 2. GENERATE AI ACTION PLAN (Groq/Llama3) ---
         real_ai_plan = ""
         
-        if ai_model:
-            # Tell Gemini exactly what the student's data is
+        if groq_client:
             prompt = f"""
-            You are an expert academic advisor. A student in the {data.Branch} branch has these metrics:
+            A student in the {data.Branch} branch has these metrics:
             - Midterm Score: {data.Midterm_Score}/100
             - Assignments: {data.Assignments_Avg}/10
             - Quizzes: {data.Quizzes_Avg}/10
@@ -141,17 +129,24 @@ def predict_performance(data: StudentInput):
             - Sleep Hours: {data.Sleep_Hours_per_Night}
             - Stress Level: {data.Stress_Level}/10
             
-            Their XGBoost predicted final score is {round(final_score, 1)}/100.
+            Their predicted final score is {round(final_score, 1)}/100.
             
             Identify their top weakest areas based ONLY on this data. Write exactly 3 short, actionable bullet points advising them on how to turn those specific weak areas into strong areas. 
             Do not use introductory text. Just provide the 3 bullet points starting with a dash (-).
             """
             
             try:
-                ai_response = ai_model.generate_content(prompt)
-                real_ai_plan = ai_response.text
+                chat_completion = groq_client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": "You are an expert academic advisor."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    model="llama3-8b-8192", 
+                    temperature=0.5,
+                )
+                real_ai_plan = chat_completion.choices[0].message.content
             except Exception as e:
-                print(f"❌ Gemini generation error: {e}")
+                print(f"❌ Groq generation error: {e}")
                 real_ai_plan = "- Focus on maintaining consistent study hours.\n- Review your weakest topics.\n- Keep your attendance high."
         else:
             real_ai_plan = "- AI Advisor is currently offline. Please check back later."
