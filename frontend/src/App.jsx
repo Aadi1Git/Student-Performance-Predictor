@@ -245,45 +245,67 @@ const App = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* LEFT: Input Form */}
-          <div className="lg:col-span-7 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
+          {/* LEFT COLUMN: Input Form AND Graph */}
+          <div className="lg:col-span-7 flex flex-col gap-8">
             
-            <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
-              <Section title="Academic Metrics" isDark={isDarkMode}>
-                <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
-                <InputField label="Assignments (0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
-                <InputField label="Quizzes (0-10)" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
-                <InputField label="Projects (0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
-              </Section>
+            {/* Input Form Card */}
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
+              
+              <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+                <Section title="Academic Metrics" isDark={isDarkMode}>
+                  <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
+                  <InputField label="Assignments (0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                  <InputField label="Quizzes (0-10)" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                  <InputField label="Projects (0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
+                </Section>
 
-              <Section title="Habits & Engagement" isDark={isDarkMode}>
-                <InputField label="Study Hrs (0-70)" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
-                <InputField label="Sleep Hrs/Nt" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} min={0} max={24} />
-                <InputField label="Participation (0-10)" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
-                <SelectField label="Internet" name="Internet_Access" value={formData.Internet_Access} onChange={handleChange} isDark={isDarkMode} options={['Yes', 'No']} />
-              </Section>
+                <Section title="Habits & Engagement" isDark={isDarkMode}>
+                  <InputField label="Study Hrs (0-70)" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
+                  <InputField label="Sleep Hrs/Nt" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} min={0} max={24} />
+                  <InputField label="Participation (0-10)" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                  <SelectField label="Internet" name="Internet_Access" value={formData.Internet_Access} onChange={handleChange} isDark={isDarkMode} options={['Yes', 'No']} />
+                </Section>
 
-              <Section title="Demographics" isDark={isDarkMode}>
-                <SelectField label="Branch" name="Branch" value={formData.Branch} onChange={handleChange} isDark={isDarkMode} options={['Civil', 'ECE', 'EEE', 'ME', 'CS', 'Other']} />
-                <SelectField label="Difficulty" name="Difficulty_Level" value={formData.Difficulty_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
-                <SelectField label="Education" name="Parent_Education_Level" value={formData.Parent_Education_Level} onChange={handleChange} isDark={isDarkMode} options={['High School', 'College', 'Postgraduate']} />
-                <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
-              </Section>
+                <Section title="Demographics" isDark={isDarkMode}>
+                  <SelectField label="Branch" name="Branch" value={formData.Branch} onChange={handleChange} isDark={isDarkMode} options={['Civil', 'ECE', 'EEE', 'ME', 'CS', 'Other']} />
+                  <SelectField label="Difficulty" name="Difficulty_Level" value={formData.Difficulty_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
+                  <SelectField label="Education" name="Parent_Education_Level" value={formData.Parent_Education_Level} onChange={handleChange} isDark={isDarkMode} options={['High School', 'College', 'Postgraduate']} />
+                  <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
+                </Section>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
-                <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                  <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
+                  <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
+                </div>
+
+                <button type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
+                  {loading ? <span className="animate-pulse">Running AI Models...</span> : <>Predict Future Performance</>}
+                </button>
+                {error && <p className="text-red-500 text-center font-medium bg-red-100/50 dark:bg-red-900/30 p-3 rounded-lg">{error}</p>}
+              </form>
+            </div>
+
+            {/* GRAPH - NOW MOVED HERE (Under the button) */}
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Student vs Class Average (Scaled %)</h3>
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                    <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <Tooltip cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }}/>
+                    <Bar dataKey="Student" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Average" fill={isDarkMode ? '#475569' : '#cbd5e1'} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
+            </div>
 
-              <button type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
-                {loading ? <span className="animate-pulse">Running AI Models...</span> : <>Predict Future Performance</>}
-              </button>
-              {error && <p className="text-red-500 text-center font-medium bg-red-100/50 dark:bg-red-900/30 p-3 rounded-lg">{error}</p>}
-            </form>
           </div>
 
-          {/* RIGHT: Dashboard Results */}
+          {/* RIGHT COLUMN: Results + AI Action Plan */}
           <div className="lg:col-span-5 flex flex-col gap-6" ref={reportRef}>
             
             <div className="flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-2xl p-5">
@@ -337,7 +359,7 @@ const App = () => {
                   <Lightbulb className="text-yellow-500 w-5 h-5" /> AI Action Plan
                 </h3>
                 
-                {/* Scrollable Container */}
+                {/* Scrollable Container Added Here */}
                 <div 
                   className="max-h-[280px] overflow-y-auto pr-2" 
                   style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}
@@ -349,7 +371,7 @@ const App = () => {
                         style={{ animationDelay: `${index * 150}ms` }}
                         className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up"
                       >
-                        {/* shrink-0 ensures the arrow doesn't get squeezed */}
+                        {/* shrink-0 ensures the arrow doesn't get squished if text is long */}
                         <span className="text-indigo-500 font-bold mt-0.5 shrink-0">→</span>
                         <span>{insight}</span>
                       </li>
@@ -358,23 +380,6 @@ const App = () => {
                 </div>
               </div>
             )}
-
-            {/* Student vs Class Average Graph */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex-grow">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Student vs Class Average (Scaled %)</h3>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <Tooltip cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
-                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }}/>
-                    <Bar dataKey="Student" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Average" fill={isDarkMode ? '#475569' : '#cbd5e1'} radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
 
           </div>
         </div>
