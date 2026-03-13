@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+// ADDED RADAR CHART IMPORTS
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight, Download } from 'lucide-react';
 
 // Firebase Imports
@@ -148,11 +149,22 @@ const App = () => {
     }
   };
 
-  const chartData = [
+  // --- CHART DATA PREPARATION ---
+  const barChartData = [
     { subject: 'Midterm', Student: formData.Midterm_Score, Average: 72 },
     { subject: 'Assign (%)', Student: formData.Assignments_Avg * 10, Average: 75 },
     { subject: 'Quizzes (%)', Student: formData.Quizzes_Avg * 10, Average: 68 },
     { subject: 'Projects (%)', Student: (formData.Projects_Score / 20) * 100, Average: 80 },
+  ];
+
+  // RADAR DATA SCALING (Everything scaled to 0-100 for a perfect web shape)
+  const radarData = [
+    { subject: 'Exams', value: formData.Midterm_Score },
+    { subject: 'Projects', value: (formData.Projects_Score / 20) * 100 },
+    { subject: 'Study Habit', value: Math.min(100, (formData.Study_Hours_per_Week / 40) * 100) }, // 40 hours = 100%
+    { subject: 'Sleep Health', value: Math.min(100, (formData.Sleep_Hours_per_Night / 8) * 100) }, // 8 hours = 100%
+    { subject: 'Attendance', value: formData.Attendance },
+    { subject: 'Activity', value: formData.Participation_Score * 10 } // 10 score = 100%
   ];
 
   if (authChecking) {
@@ -245,7 +257,7 @@ const App = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* LEFT COLUMN: Input Form AND Graph */}
+          {/* LEFT COLUMN: Input Form AND TWO Charts */}
           <div className="lg:col-span-7 flex flex-col gap-8">
             
             {/* Input Form Card */}
@@ -286,23 +298,43 @@ const App = () => {
               </form>
             </div>
 
-            {/* GRAPH - NOW MOVED HERE (Under the button) */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Student vs Class Average (Scaled %)</h3>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <Tooltip cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
-                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }}/>
-                    <Bar dataKey="Student" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Average" fill={isDarkMode ? '#475569' : '#cbd5e1'} radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+            {/* DUAL CHARTS GRID - BELOW FORM */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              
+              {/* 1. Bar Chart */}
+              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-3xl p-6">
+                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider text-center">Class Comparison</h3>
+                <div className="h-56 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barChartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                      <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <Tooltip cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
+                      <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }}/>
+                      <Bar dataKey="Student" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Average" fill={isDarkMode ? '#475569' : '#cbd5e1'} radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
-            </div>
 
+              {/* 2. NEW: Radar Chart (Spider Web) */}
+              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-3xl p-6">
+                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider text-center">Student Profile Shape</h3>
+                <div className="h-56 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                      <PolarGrid stroke={isDarkMode ? '#475569' : '#cbd5e1'} />
+                      <PolarAngleAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 10 }} />
+                      <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                      <Radar name="Score Strength" dataKey="value" stroke="#a855f7" fill="#a855f7" fillOpacity={0.5} />
+                      <Tooltip contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+            </div>
           </div>
 
           {/* RIGHT COLUMN: Results + AI Action Plan */}
@@ -352,14 +384,13 @@ const App = () => {
               )}
             </div>
 
-            {/* AI Action Plan - WITH SCROLLBAR FIX */}
+            {/* AI Action Plan */}
             {prediction !== null && (
               <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
                 <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
                   <Lightbulb className="text-yellow-500 w-5 h-5" /> AI Action Plan
                 </h3>
                 
-                {/* Scrollable Container Added Here */}
                 <div 
                   className="max-h-[280px] overflow-y-auto pr-2" 
                   style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}
@@ -371,7 +402,6 @@ const App = () => {
                         style={{ animationDelay: `${index * 150}ms` }}
                         className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up"
                       >
-                        {/* shrink-0 ensures the arrow doesn't get squished if text is long */}
                         <span className="text-indigo-500 font-bold mt-0.5 shrink-0">→</span>
                         <span>{insight}</span>
                       </li>
