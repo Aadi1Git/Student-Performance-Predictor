@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight, Download } from 'lucide-react';
+// ADDED 'Send' and 'MessageSquare' icons for the chat
+import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight, Download, Send, MessageSquare } from 'lucide-react';
 
 // Firebase Imports
 import { auth } from './firebase';
@@ -18,6 +19,11 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [insights, setInsights] = useState([]); 
+  
+  // NEW: CHAT STATE
+  const [chatInput, setChatInput] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isChatLoading, setIsChatLoading] = useState(false);
   
   // PDF State and Ref
   const reportRef = useRef(null);
@@ -85,34 +91,27 @@ const App = () => {
   const handleDownloadPDF = async () => {
     if (!reportRef.current) return;
     setIsDownloading(true);
-    
     try {
       const element = reportRef.current;
-      
       const canvas = await html2canvas(element, {
-        scale: 2, 
-        backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight
+        scale: 2, backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
+        windowWidth: element.scrollWidth, windowHeight: element.scrollHeight
       });
-      
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 210; 
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
       const pdf = new jsPDF('p', 'mm', [imgWidth, imgHeight]);
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      
       const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Student';
       pdf.save(`${userName}_Performance_Report.pdf`);
     } catch (err) {
-      console.error("Failed to generate PDF", err);
-      alert("There was an issue generating the PDF. Please try again.");
+      alert("There was an issue generating the PDF.");
     } finally {
       setIsDownloading(false);
     }
   };
 
+  // MAIN PREDICT SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -123,28 +122,45 @@ const App = () => {
       
       setTimeout(() => {
         setPrediction(Math.min(100, response.data.predicted_score));
-
         const rawAiText = response.data.ai_action_plan;
-        
         let cleanInsights = [];
         if (rawAiText) {
-          cleanInsights = rawAiText
-            .split('\n')
-            .filter(line => line.trim().length > 0)
-            .map(line => line.replace(/^-\s*/, '').replace(/^\*\s*/, '').trim());
+          cleanInsights = rawAiText.split('\n').filter(line => line.trim().length > 0).map(line => line.replace(/^-\s*/, '').replace(/^\*\s*/, '').trim());
         }
-
-        if (cleanInsights.length === 0) {
-          cleanInsights.push("Keep up the fantastic work! Your current habits are setting you up for success.");
-        }
-
+        if (cleanInsights.length === 0) cleanInsights.push("Keep up the fantastic work!");
         setInsights(cleanInsights); 
       }, 500);
-
     } catch (err) {
       setError('Error: ' + (err.response?.data?.detail || err.message));
     } finally {
       setLoading(false);
+    }
+  };
+
+  // NEW: CHAT SUBMIT HANDLER
+  const handleChatSubmit = async (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+
+    // Add user question to chat history instantly
+    const newChatHistory = [...chatHistory, { role: 'user', text: chatInput }];
+    setChatHistory(newChatHistory);
+    setChatInput('');
+    setIsChatLoading(true);
+
+    try {
+      // Call the new backend endpoint
+      const response = await axios.post('https://student-performance-predictor-rbqq.onrender.com/chat', {
+        student_data: formData, // Send their current stats
+        question: chatInput     // Send their question
+      });
+      
+      // Add AI answer to history
+      setChatHistory([...newChatHistory, { role: 'ai', text: response.data.answer }]);
+    } catch (err) {
+      setChatHistory([...newChatHistory, { role: 'ai', text: "Sorry, I couldn't process that right now. Try again later!" }]);
+    } finally {
+      setIsChatLoading(false);
     }
   };
 
@@ -165,38 +181,20 @@ const App = () => {
     { subject: 'Activity', value: formData.Participation_Score * 10 }
   ];
 
-  if (authChecking) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900"><BrainCircuit className="animate-spin text-indigo-500 w-10 h-10" /></div>;
-  }
+  if (authChecking) return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900"><BrainCircuit className="animate-spin text-indigo-500 w-10 h-10" /></div>;
 
-  if (!isAuthenticated) {
-    return (
-      <AuthScreen 
-        isLoginView={isLoginView} 
-        setIsLoginView={setIsLoginView} 
-        isDark={isDarkMode}
-        toggleTheme={() => setIsDarkMode(!isDarkMode)}
-      />
-    );
-  }
+  if (!isAuthenticated) return <AuthScreen isLoginView={isLoginView} setIsLoginView={setIsLoginView} isDark={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} />;
 
   if (currentUser && !currentUser.emailVerified) {
     return (
-      <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center
-        ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
+      <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
         <div className="max-w-md w-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 text-center animate-fade-in-up">
-          <div className="flex justify-center mb-6">
-            <div className="p-4 bg-yellow-500 rounded-2xl shadow-lg shadow-yellow-500/30 text-white"><Mail size={40} /></div>
-          </div>
+          <div className="flex justify-center mb-6"><div className="p-4 bg-yellow-500 rounded-2xl shadow-lg shadow-yellow-500/30 text-white"><Mail size={40} /></div></div>
           <h2 className="text-2xl font-extrabold text-gray-800 dark:text-white mb-4">Check Your Inbox</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm leading-relaxed">
-            We sent a secure verification link to <br/>
-            <span className="font-bold text-indigo-600 dark:text-indigo-400">{currentUser.email}</span>. <br/><br/>
-            Please click the link in that email to prove you own this address and unlock your Predictor Dashboard.
-          </p>
+          <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm">We sent a secure verification link to <br/><span className="font-bold text-indigo-600 dark:text-indigo-400">{currentUser.email}</span>. <br/><br/>Please click the link in that email to prove you own this address.</p>
           <div className="space-y-4">
             <button onClick={() => window.location.reload()} className="w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500">I've Verified My Email</button>
-            <button onClick={handleLogout} className="w-full py-3.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800 transition-all active:scale-95">Log Out</button>
+            <button onClick={handleLogout} className="w-full py-3.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800">Log Out</button>
           </div>
         </div>
       </div>
@@ -298,7 +296,7 @@ const App = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Results + AI Action Plan */}
+          {/* RIGHT COLUMN: Results + AI Action Plan + CHAT */}
           <div className="lg:col-span-5 flex flex-col gap-6" ref={reportRef}>
             
             <div className="flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-2xl p-5">
@@ -312,17 +310,13 @@ const App = () => {
                </div>
                
                {prediction !== null && (
-                 <button 
-                   onClick={handleDownloadPDF} 
-                   disabled={isDownloading}
-                   className={`flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded-lg transition-all shadow-md
-                     ${isDownloading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 hover:shadow-indigo-500/30 active:scale-95'}`}
-                 >
+                 <button onClick={handleDownloadPDF} disabled={isDownloading} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded-lg transition-all shadow-md ${isDownloading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 hover:shadow-indigo-500/30 active:scale-95'}`}>
                    {isDownloading ? <span className="animate-pulse">Generating...</span> : <><Download size={14} /> Download PDF</>}
                  </button>
                )}
             </div>
 
+            {/* Circle Score */}
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 flex flex-col items-center justify-center min-h-[250px]">
               {prediction !== null ? (
                 <div className="relative flex items-center justify-center animate-fade-in-up">
@@ -345,24 +339,17 @@ const App = () => {
               )}
             </div>
 
-            {/* AI Action Plan - ALWAYS VISIBLE */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex-grow flex flex-col">
+            {/* AI Action Plan */}
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
                 <Lightbulb className={prediction !== null ? "text-yellow-500 w-5 h-5" : "text-gray-400 dark:text-gray-500 w-5 h-5"} /> AI Action Plan
               </h3>
               
               {prediction !== null ? (
-                <div 
-                  className="max-h-[280px] overflow-y-auto pr-2" 
-                  style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}
-                >
+                <div className="max-h-[220px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
                   <ul className="space-y-3">
                     {insights.map((insight, index) => (
-                      <li 
-                        key={index} 
-                        style={{ animationDelay: `${index * 150}ms` }}
-                        className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up"
-                      >
+                      <li key={index} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up">
                         <span className="text-indigo-500 font-bold mt-0.5 shrink-0">→</span>
                         <span>{insight}</span>
                       </li>
@@ -370,11 +357,65 @@ const App = () => {
                   </ul>
                 </div>
               ) : (
-                <div className="flex-grow flex flex-col items-center justify-center min-h-[180px] text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl">
+                <div className="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl">
                    <p className="text-sm font-medium">Awaiting Data to Generate Plan...</p>
                 </div>
               )}
             </div>
+
+            {/* NEW: AI CHAT ASSISTANT */}
+            {prediction !== null && (
+              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col animate-fade-in-up">
+                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <MessageSquare className="text-indigo-500 w-5 h-5" /> Ask AI Advisor
+                </h3>
+                
+                {/* Chat History Box */}
+                <div className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 flex flex-col h-48 overflow-y-auto mb-4 border border-gray-100 dark:border-slate-700/50" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
+                  {chatHistory.length === 0 ? (
+                    <div className="m-auto text-sm text-gray-400 dark:text-gray-500 text-center italic">
+                      "Have a specific question about your stats? Ask me anything!"
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {chatHistory.map((msg, idx) => (
+                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`text-sm px-4 py-2 rounded-2xl max-w-[85%] shadow-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm border border-gray-200 dark:border-slate-600'}`}>
+                            {msg.text}
+                          </div>
+                        </div>
+                      ))}
+                      {isChatLoading && (
+                         <div className="flex justify-start">
+                           <div className="text-sm px-4 py-2 rounded-2xl bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm animate-pulse border border-gray-200 dark:border-slate-600">
+                             Thinking...
+                           </div>
+                         </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Chat Input Field */}
+                <form onSubmit={handleChatSubmit} className="relative">
+                  <input 
+                    type="text" 
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder={`How do I improve my ${formData.Branch} grades?`} 
+                    className={`w-full pl-4 pr-12 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm ${isDarkMode ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/80 border-gray-200 text-gray-900 placeholder-gray-400 shadow-sm'}`}
+                    disabled={isChatLoading}
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={isChatLoading || !chatInput.trim()}
+                    className="absolute right-2 top-2 p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  >
+                    <Send size={18} />
+                  </button>
+                </form>
+              </div>
+            )}
 
           </div>
         </div>
@@ -436,7 +477,6 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
     e.preventDefault();
     setAuthLoading(true);
     setAuthError('');
-
     try {
       if (!isLoginView) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
