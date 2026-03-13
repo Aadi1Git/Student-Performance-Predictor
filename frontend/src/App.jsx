@@ -222,13 +222,13 @@ const App = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
           {/* LEFT COLUMN */}
-          <div className="lg:col-span-7 flex flex-col gap-8">
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+          <div className="lg:col-span-7 flex flex-col gap-8 h-full">
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden flex-grow">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
-              <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+              <form onSubmit={handleSubmit} className="space-y-8 relative z-10 h-full flex flex-col">
                 <Section title="Academic Metrics" isDark={isDarkMode}>
                   <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
                   <InputField label="Assignments (0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
@@ -247,11 +247,11 @@ const App = () => {
                   <SelectField label="Education" name="Parent_Education_Level" value={formData.Parent_Education_Level} onChange={handleChange} isDark={isDarkMode} options={['High School', 'College', 'Postgraduate']} />
                   <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
                 </Section>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 flex-grow">
                   <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
                   <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
                 </div>
-                <button type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
+                <button type="submit" disabled={loading} className={`w-full py-4 mt-auto rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
                   {loading ? <span className="animate-pulse">Running AI Models...</span> : <>Predict Future Performance</>}
                 </button>
                 {error && <p className="text-red-500 text-center font-medium bg-red-100/50 dark:bg-red-900/30 p-3 rounded-lg">{error}</p>}
@@ -259,7 +259,7 @@ const App = () => {
             </div>
 
             {/* Graphs Grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-auto">
               <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-3xl p-6">
                 <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider text-center">Class Comparison</h3>
                 <div className="h-56 w-full">
@@ -294,7 +294,7 @@ const App = () => {
           </div>
 
           {/* RIGHT COLUMN */}
-          <div className="lg:col-span-5 flex flex-col gap-6" ref={reportRef}>
+          <div className="lg:col-span-5 flex flex-col gap-6 h-full" ref={reportRef}>
             
             <div className="flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-2xl p-5">
                <div>
@@ -313,7 +313,8 @@ const App = () => {
                )}
             </div>
 
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 flex flex-col items-center justify-center min-h-[250px]">
+            {/* PREDICTION SCORE CARD */}
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 flex flex-col items-center justify-center flex-grow">
               {prediction !== null ? (
                 <div className="relative flex items-center justify-center animate-fade-in-up">
                   <svg className="w-48 h-48 transform -rotate-90">
@@ -335,14 +336,14 @@ const App = () => {
               )}
             </div>
 
-            {/* AI Action Plan - ALWAYS VISIBLE */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+            {/* AI Action Plan - ALWAYS VISIBLE, FIXED HEIGHT */}
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col h-[300px] min-h-[300px]">
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2 shrink-0">
                 <Lightbulb className={prediction !== null ? "text-yellow-500 w-5 h-5" : "text-gray-400 dark:text-gray-500 w-5 h-5"} /> AI Action Plan
               </h3>
               
               {prediction !== null ? (
-                <div className="max-h-[220px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
+                <div className="flex-grow overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
                   <ul className="space-y-3">
                     {insights.map((insight, index) => (
                       <li key={index} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up">
@@ -353,14 +354,14 @@ const App = () => {
                   </ul>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl">
+                <div className="flex-grow flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl">
                    <p className="text-sm font-medium">Awaiting Data to Generate Plan...</p>
                 </div>
               )}
             </div>
 
             {/* AI CHAT ASSISTANT - ALWAYS VISIBLE */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col flex-grow">
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
                 <MessageSquare className={prediction !== null ? "text-indigo-500 w-5 h-5" : "text-gray-400 dark:text-gray-500 w-5 h-5"} /> Ask AI Advisor
               </h3>
@@ -450,6 +451,9 @@ const App = () => {
     </div>
   );
 };
+
+// ... (Rest of your components like Section, InputField, SelectField, SliderField, AuthScreen remain unchanged)
+
 
 // --- REUSABLE COMPONENTS ---
 const Section = ({ title, children, isDark }) => (
