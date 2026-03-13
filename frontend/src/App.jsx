@@ -367,8 +367,8 @@ const App = () => {
               
               {prediction !== null ? (
                 <>
-                  {/* Chat History Box */}
-                  <div className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 flex flex-col h-48 overflow-y-auto mb-4 border border-gray-100 dark:border-slate-700/50" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
+                  {/* Chat History Box - FIXED HEIGHT AND SCROLLBAR */}
+                  <div className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 flex flex-col h-[180px] min-h-[180px] max-h-[180px] overflow-y-auto mb-4 border border-gray-100 dark:border-slate-700/50" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
                     {chatHistory.length === 0 ? (
                       <div className="m-auto text-sm text-gray-400 dark:text-gray-500 text-center italic">
                         "Have a specific question about your stats? Ask me anything!"
@@ -394,7 +394,7 @@ const App = () => {
                   </div>
 
                   {/* Chat Input Field */}
-                  <form onSubmit={handleChatSubmit} className="relative">
+                  <form onSubmit={handleChatSubmit} className="relative mt-auto">
                     <input 
                       type="text" 
                       value={chatInput}
@@ -414,13 +414,13 @@ const App = () => {
                 </>
               ) : (
                 <>
-                  {/* Chat Placeholder Box */}
-                  <div className="flex flex-col items-center justify-center h-48 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl mb-4">
+                  {/* Chat Placeholder Box - MATCHING FIXED HEIGHT */}
+                  <div className="flex flex-col items-center justify-center h-[180px] min-h-[180px] max-h-[180px] text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl mb-4">
                     <MessageSquare size={32} className="mb-3 opacity-50" />
                     <p className="text-sm font-medium px-6 text-center">Run a prediction to unlock the AI Chat Assistant.</p>
                   </div>
                   {/* Disabled Chat Input */}
-                  <div className="relative">
+                  <div className="relative mt-auto">
                     <input 
                       type="text" 
                       disabled
