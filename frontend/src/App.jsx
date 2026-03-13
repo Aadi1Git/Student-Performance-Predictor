@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
-// ADDED 'Send' and 'MessageSquare' icons for the chat
 import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight, Download, Send, MessageSquare } from 'lucide-react';
 
 // Firebase Imports
@@ -20,7 +19,7 @@ const App = () => {
   const [error, setError] = useState('');
   const [insights, setInsights] = useState([]); 
   
-  // NEW: CHAT STATE
+  // CHAT STATE
   const [chatInput, setChatInput] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
@@ -137,25 +136,22 @@ const App = () => {
     }
   };
 
-  // NEW: CHAT SUBMIT HANDLER
+  // CHAT SUBMIT HANDLER
   const handleChatSubmit = async (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
-    // Add user question to chat history instantly
     const newChatHistory = [...chatHistory, { role: 'user', text: chatInput }];
     setChatHistory(newChatHistory);
     setChatInput('');
     setIsChatLoading(true);
 
     try {
-      // Call the new backend endpoint
       const response = await axios.post('https://student-performance-predictor-rbqq.onrender.com/chat', {
-        student_data: formData, // Send their current stats
-        question: chatInput     // Send their question
+        student_data: formData, 
+        question: chatInput     
       });
       
-      // Add AI answer to history
       setChatHistory([...newChatHistory, { role: 'ai', text: response.data.answer }]);
     } catch (err) {
       setChatHistory([...newChatHistory, { role: 'ai', text: "Sorry, I couldn't process that right now. Try again later!" }]);
@@ -208,6 +204,7 @@ const App = () => {
       ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
       
       <div className="max-w-7xl w-full mx-auto animate-fade-in-up">
+        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30 text-white"><BrainCircuit size={28} /></div>
@@ -227,11 +224,10 @@ const App = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* LEFT COLUMN: Input Form AND TWO Charts */}
+          {/* LEFT COLUMN */}
           <div className="lg:col-span-7 flex flex-col gap-8">
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
-              
               <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
                 <Section title="Academic Metrics" isDark={isDarkMode}>
                   <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
@@ -262,6 +258,7 @@ const App = () => {
               </form>
             </div>
 
+            {/* Graphs Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-3xl p-6">
                 <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider text-center">Class Comparison</h3>
@@ -296,7 +293,7 @@ const App = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Results + AI Action Plan + CHAT */}
+          {/* RIGHT COLUMN */}
           <div className="lg:col-span-5 flex flex-col gap-6" ref={reportRef}>
             
             <div className="flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-2xl p-5">
@@ -316,7 +313,6 @@ const App = () => {
                )}
             </div>
 
-            {/* Circle Score */}
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 flex flex-col items-center justify-center min-h-[250px]">
               {prediction !== null ? (
                 <div className="relative flex items-center justify-center animate-fade-in-up">
@@ -339,7 +335,7 @@ const App = () => {
               )}
             </div>
 
-            {/* AI Action Plan */}
+            {/* AI Action Plan - ALWAYS VISIBLE */}
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
                 <Lightbulb className={prediction !== null ? "text-yellow-500 w-5 h-5" : "text-gray-400 dark:text-gray-500 w-5 h-5"} /> AI Action Plan
@@ -363,59 +359,84 @@ const App = () => {
               )}
             </div>
 
-            {/* NEW: AI CHAT ASSISTANT */}
-            {prediction !== null && (
-              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col animate-fade-in-up">
-                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
-                  <MessageSquare className="text-indigo-500 w-5 h-5" /> Ask AI Advisor
-                </h3>
-                
-                {/* Chat History Box */}
-                <div className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 flex flex-col h-48 overflow-y-auto mb-4 border border-gray-100 dark:border-slate-700/50" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
-                  {chatHistory.length === 0 ? (
-                    <div className="m-auto text-sm text-gray-400 dark:text-gray-500 text-center italic">
-                      "Have a specific question about your stats? Ask me anything!"
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {chatHistory.map((msg, idx) => (
-                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`text-sm px-4 py-2 rounded-2xl max-w-[85%] shadow-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm border border-gray-200 dark:border-slate-600'}`}>
-                            {msg.text}
+            {/* AI CHAT ASSISTANT - ALWAYS VISIBLE */}
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col flex-grow">
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <MessageSquare className={prediction !== null ? "text-indigo-500 w-5 h-5" : "text-gray-400 dark:text-gray-500 w-5 h-5"} /> Ask AI Advisor
+              </h3>
+              
+              {prediction !== null ? (
+                <>
+                  {/* Chat History Box */}
+                  <div className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 flex flex-col h-48 overflow-y-auto mb-4 border border-gray-100 dark:border-slate-700/50" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
+                    {chatHistory.length === 0 ? (
+                      <div className="m-auto text-sm text-gray-400 dark:text-gray-500 text-center italic">
+                        "Have a specific question about your stats? Ask me anything!"
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {chatHistory.map((msg, idx) => (
+                          <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`text-sm px-4 py-2 rounded-2xl max-w-[85%] shadow-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm border border-gray-200 dark:border-slate-600'}`}>
+                              {msg.text}
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                      {isChatLoading && (
-                         <div className="flex justify-start">
-                           <div className="text-sm px-4 py-2 rounded-2xl bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm animate-pulse border border-gray-200 dark:border-slate-600">
-                             Thinking...
+                        ))}
+                        {isChatLoading && (
+                           <div className="flex justify-start">
+                             <div className="text-sm px-4 py-2 rounded-2xl bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm animate-pulse border border-gray-200 dark:border-slate-600">
+                               Thinking...
+                             </div>
                            </div>
-                         </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
-                {/* Chat Input Field */}
-                <form onSubmit={handleChatSubmit} className="relative">
-                  <input 
-                    type="text" 
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder={`How do I improve my ${formData.Branch} grades?`} 
-                    className={`w-full pl-4 pr-12 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm ${isDarkMode ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/80 border-gray-200 text-gray-900 placeholder-gray-400 shadow-sm'}`}
-                    disabled={isChatLoading}
-                  />
-                  <button 
-                    type="submit" 
-                    disabled={isChatLoading || !chatInput.trim()}
-                    className="absolute right-2 top-2 p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-                  >
-                    <Send size={18} />
-                  </button>
-                </form>
-              </div>
-            )}
+                  {/* Chat Input Field */}
+                  <form onSubmit={handleChatSubmit} className="relative">
+                    <input 
+                      type="text" 
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      placeholder={`How do I improve my ${formData.Branch} grades?`} 
+                      className={`w-full pl-4 pr-12 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm ${isDarkMode ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/80 border-gray-200 text-gray-900 placeholder-gray-400 shadow-sm'}`}
+                      disabled={isChatLoading}
+                    />
+                    <button 
+                      type="submit" 
+                      disabled={isChatLoading || !chatInput.trim()}
+                      className="absolute right-2 top-2 p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                    >
+                      <Send size={18} />
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  {/* Chat Placeholder Box */}
+                  <div className="flex flex-col items-center justify-center h-48 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl mb-4">
+                    <MessageSquare size={32} className="mb-3 opacity-50" />
+                    <p className="text-sm font-medium px-6 text-center">Run a prediction to unlock the AI Chat Assistant.</p>
+                  </div>
+                  {/* Disabled Chat Input */}
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      disabled
+                      placeholder="Awaiting data..." 
+                      className={`w-full pl-4 pr-12 py-3 rounded-xl border outline-none transition-all text-sm opacity-60 cursor-not-allowed ${isDarkMode ? 'bg-slate-800/30 border-slate-700 text-gray-500' : 'bg-gray-50 border-gray-200 text-gray-400'}`}
+                    />
+                    <button 
+                      disabled
+                      className="absolute right-2 top-2 p-1.5 rounded-lg bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 transition-all opacity-50 cursor-not-allowed"
+                    >
+                      <Send size={18} />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
 
           </div>
         </div>
