@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-// ADDED RADAR CHART IMPORTS
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight, Download } from 'lucide-react';
 
@@ -157,14 +156,13 @@ const App = () => {
     { subject: 'Projects (%)', Student: (formData.Projects_Score / 20) * 100, Average: 80 },
   ];
 
-  // RADAR DATA SCALING (Everything scaled to 0-100 for a perfect web shape)
   const radarData = [
     { subject: 'Exams', value: formData.Midterm_Score },
     { subject: 'Projects', value: (formData.Projects_Score / 20) * 100 },
-    { subject: 'Study Habit', value: Math.min(100, (formData.Study_Hours_per_Week / 40) * 100) }, // 40 hours = 100%
-    { subject: 'Sleep Health', value: Math.min(100, (formData.Sleep_Hours_per_Night / 8) * 100) }, // 8 hours = 100%
+    { subject: 'Study Habit', value: Math.min(100, (formData.Study_Hours_per_Week / 40) * 100) },
+    { subject: 'Sleep Health', value: Math.min(100, (formData.Sleep_Hours_per_Night / 8) * 100) },
     { subject: 'Attendance', value: formData.Attendance },
-    { subject: 'Activity', value: formData.Participation_Score * 10 } // 10 score = 100%
+    { subject: 'Activity', value: formData.Participation_Score * 10 }
   ];
 
   if (authChecking) {
@@ -187,33 +185,18 @@ const App = () => {
       <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center
         ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
         <div className="max-w-md w-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 text-center animate-fade-in-up">
-          
           <div className="flex justify-center mb-6">
-            <div className="p-4 bg-yellow-500 rounded-2xl shadow-lg shadow-yellow-500/30 text-white">
-              <Mail size={40} />
-            </div>
+            <div className="p-4 bg-yellow-500 rounded-2xl shadow-lg shadow-yellow-500/30 text-white"><Mail size={40} /></div>
           </div>
-          
           <h2 className="text-2xl font-extrabold text-gray-800 dark:text-white mb-4">Check Your Inbox</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm leading-relaxed">
             We sent a secure verification link to <br/>
             <span className="font-bold text-indigo-600 dark:text-indigo-400">{currentUser.email}</span>. <br/><br/>
             Please click the link in that email to prove you own this address and unlock your Predictor Dashboard.
           </p>
-          
           <div className="space-y-4">
-            <button 
-              onClick={() => window.location.reload()} 
-              className="w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
-            >
-              I've Verified My Email
-            </button>
-            <button 
-              onClick={handleLogout} 
-              className="w-full py-3.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800 transition-all active:scale-95"
-            >
-              Log Out
-            </button>
+            <button onClick={() => window.location.reload()} className="w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500">I've Verified My Email</button>
+            <button onClick={handleLogout} className="w-full py-3.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800 transition-all active:scale-95">Log Out</button>
           </div>
         </div>
       </div>
@@ -229,27 +212,16 @@ const App = () => {
       <div className="max-w-7xl w-full mx-auto animate-fade-in-up">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30 text-white">
-              <BrainCircuit size={28} />
-            </div>
+            <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30 text-white"><BrainCircuit size={28} /></div>
             <div>
               <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
                 Student Performance Predictor
               </h1>
             </div>
           </div>
-          
           <div className="flex items-center gap-4">
-            <button 
-              onClick={handleLogout}
-              className="px-5 py-2.5 text-sm font-bold rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-indigo-600 dark:text-indigo-400"
-            >
-              Log Out
-            </button>
-            <button 
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200"
-            >
+            <button onClick={handleLogout} className="px-5 py-2.5 text-sm font-bold rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-indigo-600 dark:text-indigo-400">Log Out</button>
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200">
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
           </div>
@@ -259,8 +231,6 @@ const App = () => {
           
           {/* LEFT COLUMN: Input Form AND TWO Charts */}
           <div className="lg:col-span-7 flex flex-col gap-8">
-            
-            {/* Input Form Card */}
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
               
@@ -271,26 +241,22 @@ const App = () => {
                   <InputField label="Quizzes (0-10)" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
                   <InputField label="Projects (0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
                 </Section>
-
                 <Section title="Habits & Engagement" isDark={isDarkMode}>
                   <InputField label="Study Hrs (0-70)" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
                   <InputField label="Sleep Hrs/Nt" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} min={0} max={24} />
                   <InputField label="Participation (0-10)" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
                   <SelectField label="Internet" name="Internet_Access" value={formData.Internet_Access} onChange={handleChange} isDark={isDarkMode} options={['Yes', 'No']} />
                 </Section>
-
                 <Section title="Demographics" isDark={isDarkMode}>
                   <SelectField label="Branch" name="Branch" value={formData.Branch} onChange={handleChange} isDark={isDarkMode} options={['Civil', 'ECE', 'EEE', 'ME', 'CS', 'Other']} />
                   <SelectField label="Difficulty" name="Difficulty_Level" value={formData.Difficulty_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
                   <SelectField label="Education" name="Parent_Education_Level" value={formData.Parent_Education_Level} onChange={handleChange} isDark={isDarkMode} options={['High School', 'College', 'Postgraduate']} />
                   <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
                 </Section>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                   <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
                   <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
                 </div>
-
                 <button type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
                   {loading ? <span className="animate-pulse">Running AI Models...</span> : <>Predict Future Performance</>}
                 </button>
@@ -298,10 +264,7 @@ const App = () => {
               </form>
             </div>
 
-            {/* DUAL CHARTS GRID - BELOW FORM */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              
-              {/* 1. Bar Chart */}
               <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-3xl p-6">
                 <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider text-center">Class Comparison</h3>
                 <div className="h-56 w-full">
@@ -318,7 +281,6 @@ const App = () => {
                 </div>
               </div>
 
-              {/* 2. NEW: Radar Chart (Spider Web) */}
               <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-3xl p-6">
                 <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider text-center">Student Profile Shape</h3>
                 <div className="h-56 w-full">
@@ -333,7 +295,6 @@ const App = () => {
                   </ResponsiveContainer>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -384,13 +345,13 @@ const App = () => {
               )}
             </div>
 
-            {/* AI Action Plan */}
-            {prediction !== null && (
-              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
-                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
-                  <Lightbulb className="text-yellow-500 w-5 h-5" /> AI Action Plan
-                </h3>
-                
+            {/* AI Action Plan - ALWAYS VISIBLE */}
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex-grow flex flex-col">
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <Lightbulb className={prediction !== null ? "text-yellow-500 w-5 h-5" : "text-gray-400 dark:text-gray-500 w-5 h-5"} /> AI Action Plan
+              </h3>
+              
+              {prediction !== null ? (
                 <div 
                   className="max-h-[280px] overflow-y-auto pr-2" 
                   style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}
@@ -408,8 +369,12 @@ const App = () => {
                     ))}
                   </ul>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="flex-grow flex flex-col items-center justify-center min-h-[180px] text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl">
+                   <p className="text-sm font-medium">Awaiting Data to Generate Plan...</p>
+                </div>
+              )}
+            </div>
 
           </div>
         </div>
