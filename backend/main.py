@@ -64,6 +64,10 @@ class StudentInput(BaseModel):
     Family_Income_Level: str
     Internet_Access: str
 
+class ChatInput(BaseModel):
+    student_data: StudentInput
+    question: str
+
 @app.post("/predict")
 def predict_performance(data: StudentInput):
     if not model:
@@ -162,6 +166,34 @@ def predict_performance(data: StudentInput):
         traceback.print_exc() 
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/chat")
+def chat_with_advisor(data: ChatInput):
+    if not groq_client:
+        raise HTTPException(status_code=503, detail="Groq API offline")
+
+    # We inject the student's exact stats so the AI knows who it is talking to!
+    prompt = f"""
+    You are an expert academic advisor helping an engineering student in the {data.student_data.Branch} branch.
+    Their current data: Midterm: {data.student_data.Midterm_Score}/100, Study: {data.student_data.Study_Hours_per_Week}hrs/wk, Sleep: {data.student_data.Sleep_Hours_per_Night}hrs/night, Attendance: {data.student_data.Attendance}%, Stress: {data.student_data.Stress_Level}/10.
+
+    The student asks: "{data.question}"
+
+    Provide a helpful, direct, and encouraging answer (max 3 sentences) tailored to their specific data. Don't use bullet points.
+    """
+
+    try:
+        chat_completion = groq_client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": "You are a friendly, highly intelligent academic advisor."},
+                {"role": "user", "content": prompt}
+            ],
+            model="llama-3.1-8b-instant", 
+            temperature=0.7,
+        )
+        return {"answer": chat_completion.choices[0].message.content}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
