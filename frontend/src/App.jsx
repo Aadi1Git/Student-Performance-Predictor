@@ -330,28 +330,36 @@ const App = () => {
               )}
             </div>
 
-            {/* AI Action Plan - NOW SWAPPED TO BE ABOVE THE GRAPH */}
+            {/* AI Action Plan - WITH SCROLLBAR FIX */}
             {prediction !== null && (
               <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6">
                 <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
                   <Lightbulb className="text-yellow-500 w-5 h-5" /> AI Action Plan
                 </h3>
-                <ul className="space-y-3">
-                  {insights.map((insight, index) => (
-                    <li 
-                      key={index} 
-                      style={{ animationDelay: `${index * 150}ms` }}
-                      className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up"
-                    >
-                      <span className="text-indigo-500 font-bold mt-0.5">→</span>
-                      {insight}
-                    </li>
-                  ))}
-                </ul>
+                
+                {/* Scrollable Container */}
+                <div 
+                  className="max-h-[280px] overflow-y-auto pr-2" 
+                  style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}
+                >
+                  <ul className="space-y-3">
+                    {insights.map((insight, index) => (
+                      <li 
+                        key={index} 
+                        style={{ animationDelay: `${index * 150}ms` }}
+                        className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up"
+                      >
+                        {/* shrink-0 ensures the arrow doesn't get squeezed */}
+                        <span className="text-indigo-500 font-bold mt-0.5 shrink-0">→</span>
+                        <span>{insight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             )}
 
-            {/* Student vs Class Average Graph - NOW SWAPPED TO BE BELOW AI PLAN */}
+            {/* Student vs Class Average Graph */}
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex-grow">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">Student vs Class Average (Scaled %)</h3>
               <div className="h-64 w-full">
