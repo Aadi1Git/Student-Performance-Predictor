@@ -93,7 +93,7 @@ const App = () => {
     try {
       const element = reportRef.current;
       const canvas = await html2canvas(element, {
-        scale: 2, backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
+        scale: 2, backgroundColor: isDarkMode ? '#0d1117' : '#f6f8fa',
         windowWidth: element.scrollWidth, windowHeight: element.scrollHeight
       });
       const imgData = canvas.toDataURL('image/png');
@@ -177,20 +177,20 @@ const App = () => {
     { subject: 'Activity', value: formData.Participation_Score * 10 }
   ];
 
-  if (authChecking) return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900"><BrainCircuit className="animate-spin text-indigo-500 w-10 h-10" /></div>;
+  if (authChecking) return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] dark:bg-[#0d1117]"><BrainCircuit className="animate-spin text-blue-600 dark:text-blue-500 w-10 h-10" /></div>;
 
   if (!isAuthenticated) return <AuthScreen isLoginView={isLoginView} setIsLoginView={setIsLoginView} isDark={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} />;
 
   if (currentUser && !currentUser.emailVerified) {
     return (
-      <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
-        <div className="max-w-md w-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 text-center animate-fade-in-up">
-          <div className="flex justify-center mb-6"><div className="p-4 bg-yellow-500 rounded-2xl shadow-lg shadow-yellow-500/30 text-white"><Mail size={40} /></div></div>
-          <h2 className="text-2xl font-extrabold text-gray-800 dark:text-white mb-4">Check Your Inbox</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm">We sent a secure verification link to <br/><span className="font-bold text-indigo-600 dark:text-indigo-400">{currentUser.email}</span>. <br/><br/>Please click the link in that email to prove you own this address.</p>
-          <div className="space-y-4">
-            <button onClick={() => window.location.reload()} className="w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500">I've Verified My Email</button>
-            <button onClick={handleLogout} className="w-full py-3.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800">Log Out</button>
+      <div className={`min-h-screen transition-colors duration-300 font-sans p-4 flex items-center justify-center ${isDarkMode ? 'bg-[#0d1117]' : 'bg-[#f6f8fa]'}`}>
+        <div className="max-w-md w-full bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] shadow-sm rounded-2xl p-8 text-center animate-fade-in-up">
+          <div className="flex justify-center mb-6"><div className="p-4 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl text-yellow-600 dark:text-yellow-500"><Mail size={32} /></div></div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Check Your Inbox</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 text-sm">We sent a secure verification link to <br/><span className="font-bold text-gray-900 dark:text-gray-200">{currentUser.email}</span>. <br/><br/>Please click the link to verify your account.</p>
+          <div className="space-y-3">
+            <button onClick={() => window.location.reload()} className="w-full py-2.5 rounded-lg font-semibold text-white transition-colors bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500">I've Verified My Email</button>
+            <button onClick={handleLogout} className="w-full py-2.5 rounded-lg font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-[#30363d] hover:bg-gray-50 dark:hover:bg-[#21262d] transition-colors">Log Out</button>
           </div>
         </div>
       </div>
@@ -199,36 +199,39 @@ const App = () => {
 
   const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Student';
 
+  // THEME VARIABLES
+  const cardClass = "bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-xl shadow-sm";
+  const primaryColor = isDarkMode ? '#3b82f6' : '#2563eb'; // blue-500 : blue-600
+
   return (
-    <div className={`min-h-screen transition-colors duration-500 font-sans p-4 sm:p-8 flex items-center justify-center
-      ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
+    <div className={`min-h-screen transition-colors duration-300 font-sans p-4 sm:p-8 flex items-center justify-center
+      ${isDarkMode ? 'bg-[#0d1117] text-gray-200' : 'bg-[#f6f8fa] text-gray-900'}`}>
       
       <div className="max-w-7xl w-full mx-auto animate-fade-in-up">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-8 pb-6 border-b border-gray-200 dark:border-[#30363d]">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30 text-white"><BrainCircuit size={28} /></div>
+            <div className="p-2.5 bg-blue-600 rounded-lg text-white"><BrainCircuit size={24} /></div>
             <div>
-              <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-                Student Performance Predictor
+              <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+                Performance Predictor
               </h1>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={handleLogout} className="px-5 py-2.5 text-sm font-bold rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-indigo-600 dark:text-indigo-400">Log Out</button>
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200">
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          <div className="flex items-center gap-3">
+            <button onClick={handleLogout} className="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#21262d] hover:bg-gray-50 dark:hover:bg-[#30363d] transition-colors text-gray-700 dark:text-gray-300">Log Out</button>
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-md border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#21262d] hover:bg-gray-50 dark:hover:bg-[#30363d] transition-colors text-gray-700 dark:text-gray-300">
+              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* LEFT COLUMN */}
-          <div className="lg:col-span-7 flex flex-col gap-8 h-full">
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden flex-grow">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
-              <form onSubmit={handleSubmit} className="space-y-8 relative z-10 h-full flex flex-col">
+          <div className="lg:col-span-7 flex flex-col gap-6 h-full">
+            <div className={`${cardClass} p-6 sm:p-8 flex-grow flex flex-col`}>
+              <form onSubmit={handleSubmit} className="space-y-8 h-full flex flex-col">
                 <Section title="Academic Metrics" isDark={isDarkMode}>
                   <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
                   <InputField label="Assignments (0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
@@ -247,45 +250,48 @@ const App = () => {
                   <SelectField label="Education" name="Parent_Education_Level" value={formData.Parent_Education_Level} onChange={handleChange} isDark={isDarkMode} options={['High School', 'College', 'Postgraduate']} />
                   <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
                 </Section>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 flex-grow">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2 flex-grow">
                   <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
                   <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
                 </div>
-                <button type="submit" disabled={loading} className={`w-full py-4 mt-auto rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all active:scale-95 flex justify-center items-center gap-2 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}>
-                  {loading ? <span className="animate-pulse">Running AI Models...</span> : <>Predict Future Performance</>}
-                </button>
-                {error && <p className="text-red-500 text-center font-medium bg-red-100/50 dark:bg-red-900/30 p-3 rounded-lg">{error}</p>}
+                
+                <div className="pt-4 mt-auto">
+                  <button type="submit" disabled={loading} className={`w-full py-3 rounded-lg font-semibold text-sm text-white transition-colors flex justify-center items-center gap-2 ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 dark:bg-green-600 dark:hover:bg-green-500'}`}>
+                    {loading ? <span className="animate-pulse">Analyzing Data...</span> : <>Predict Future Performance</>}
+                  </button>
+                  {error && <p className="text-red-600 dark:text-red-400 text-sm text-center font-medium mt-3">{error}</p>}
+                </div>
               </form>
             </div>
 
             {/* Graphs Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-auto">
-              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-3xl p-6">
-                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider text-center">Class Comparison</h3>
-                <div className="h-56 w-full">
+              <div className={`${cardClass} p-5`}>
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider">Class Comparison</h3>
+                <div className="h-48 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={barChartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-                      <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
+                    <BarChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+                      <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#8b949e' : '#6e7781', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: isDarkMode ? '#8b949e' : '#6e7781', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <Tooltip cursor={{ fill: isDarkMode ? '#21262d' : '#f3f4f6' }} contentStyle={{ backgroundColor: isDarkMode ? '#161b22' : '#ffffff', borderRadius: '8px', border: `1px solid ${isDarkMode ? '#30363d' : '#e5e7eb'}`, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
                       <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }}/>
-                      <Bar dataKey="Student" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="Average" fill={isDarkMode ? '#475569' : '#cbd5e1'} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Student" fill={primaryColor} radius={[2, 2, 0, 0]} />
+                      <Bar dataKey="Average" fill={isDarkMode ? '#30363d' : '#e5e7eb'} radius={[2, 2, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
-              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-3xl p-6">
-                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider text-center">Student Profile Shape</h3>
-                <div className="h-56 w-full">
+              <div className={`${cardClass} p-5`}>
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider">Profile Shape</h3>
+                <div className="h-48 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                      <PolarGrid stroke={isDarkMode ? '#475569' : '#cbd5e1'} />
-                      <PolarAngleAxis dataKey="subject" tick={{ fill: isDarkMode ? '#9ca3af' : '#4b5563', fontSize: 10 }} />
+                      <PolarGrid stroke={isDarkMode ? '#30363d' : '#e5e7eb'} />
+                      <PolarAngleAxis dataKey="subject" tick={{ fill: isDarkMode ? '#8b949e' : '#6e7781', fontSize: 10 }} />
                       <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                      <Radar name="Score Strength" dataKey="value" stroke="#a855f7" fill="#a855f7" fillOpacity={0.5} />
-                      <Tooltip contentStyle={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
+                      <Radar name="Score" dataKey="value" stroke={primaryColor} fill={primaryColor} fillOpacity={0.3} />
+                      <Tooltip contentStyle={{ backgroundColor: isDarkMode ? '#161b22' : '#ffffff', borderRadius: '8px', border: `1px solid ${isDarkMode ? '#30363d' : '#e5e7eb'}`, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
@@ -296,96 +302,95 @@ const App = () => {
           {/* RIGHT COLUMN */}
           <div className="lg:col-span-5 flex flex-col gap-6 h-full" ref={reportRef}>
             
-            <div className="flex justify-between items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-xl rounded-2xl p-5">
+            <div className={`${cardClass} p-4 flex justify-between items-center`}>
                <div>
-                 <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
-                   <Award className="text-purple-500 w-5 h-5" /> Performance Report
+                 <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                   <Award className="text-blue-600 dark:text-blue-500 w-4 h-4" /> Performance Report
                  </h3>
-                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1.5 ml-7">
-                   Student: <span className="text-indigo-600 dark:text-indigo-400 font-bold text-sm">{userName}</span>
+                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 ml-6">
+                   Student: <span className="text-gray-900 dark:text-gray-200 font-medium">{userName}</span>
                  </p>
                </div>
                
                {prediction !== null && (
-                 <button onClick={handleDownloadPDF} disabled={isDownloading} className={`flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded-lg transition-all shadow-md ${isDownloading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 hover:shadow-indigo-500/30 active:scale-95'}`}>
-                   {isDownloading ? <span className="animate-pulse">Generating...</span> : <><Download size={14} /> Download PDF</>}
+                 <button onClick={handleDownloadPDF} disabled={isDownloading} className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium border rounded-md transition-colors ${isDownloading ? 'bg-gray-100 dark:bg-[#21262d] text-gray-400 cursor-not-allowed border-transparent' : 'bg-white dark:bg-[#21262d] border-gray-300 dark:border-[#30363d] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#30363d]'}`}>
+                   {isDownloading ? <span className="animate-pulse">Generating...</span> : <><Download size={14} /> PDF</>}
                  </button>
                )}
             </div>
 
             {/* PREDICTION SCORE CARD */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 flex flex-col items-center justify-center flex-grow">
+            <div className={`${cardClass} p-8 flex flex-col items-center justify-center flex-grow`}>
               {prediction !== null ? (
                 <div className="relative flex items-center justify-center animate-fade-in-up">
-                  <svg className="w-48 h-48 transform -rotate-90">
-                    <circle cx="96" cy="96" r="85" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-gray-200 dark:text-slate-700" />
-                    <circle cx="96" cy="96" r="85" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="534" strokeDashoffset={534 - (prediction / 100) * 534} strokeLinecap="round" className={`transition-all duration-1500 ease-out ${prediction >= 80 ? 'text-green-500' : prediction >= 60 ? 'text-yellow-500' : 'text-red-500'}`} />
+                  <svg className="w-40 h-40 transform -rotate-90">
+                    <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-gray-100 dark:text-[#21262d]" />
+                    <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="440" strokeDashoffset={440 - (prediction / 100) * 440} strokeLinecap="round" className={`transition-all duration-1500 ease-out ${prediction >= 80 ? 'text-green-500' : prediction >= 60 ? 'text-yellow-500' : 'text-red-500'}`} />
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{prediction.toFixed(1)}</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">out of 100</span>
+                    <span className="text-4xl font-bold text-gray-900 dark:text-gray-100">{prediction.toFixed(1)}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1 uppercase tracking-widest">Score</span>
                   </div>
                 </div>
               ) : (
-                <div className="text-center text-gray-400 dark:text-gray-500 flex flex-col items-center">
-                  <div className="w-48 h-48 border-8 border-dashed border-gray-200 dark:border-slate-700 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
-                    <BrainCircuit size={40} className="animate-pulse" />
+                <div className="text-center text-gray-400 dark:text-gray-600 flex flex-col items-center">
+                  <div className="w-32 h-32 border-4 border-dashed border-gray-200 dark:border-[#30363d] rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
+                    <BrainCircuit size={32} className="opacity-50" />
                   </div>
-                  <p className="mt-6 text-sm">Awaiting Input Data...</p>
+                  <p className="mt-4 text-sm font-medium">Awaiting Input Data</p>
                 </div>
               )}
             </div>
 
             {/* AI Action Plan - ALWAYS VISIBLE, FIXED HEIGHT */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col h-[300px] min-h-[300px]">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2 shrink-0">
-                <Lightbulb className={prediction !== null ? "text-yellow-500 w-5 h-5" : "text-gray-400 dark:text-gray-500 w-5 h-5"} /> AI Action Plan
+            <div className={`${cardClass} p-5 flex flex-col h-[280px] min-h-[280px]`}>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2 shrink-0">
+                <Lightbulb className={prediction !== null ? "text-yellow-500 w-4 h-4" : "text-gray-400 dark:text-gray-600 w-4 h-4"} /> Action Plan
               </h3>
               
               {prediction !== null ? (
-                <div className="flex-grow overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
-                  <ul className="space-y-3">
+                <div className="flex-grow overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: isDarkMode ? '#4b5563 transparent' : '#d1d5db transparent' }}>
+                  <ul className="space-y-2">
                     {insights.map((insight, index) => (
-                      <li key={index} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-100 dark:border-slate-700/50 animate-fade-in-up">
-                        <span className="text-indigo-500 font-bold mt-0.5 shrink-0">→</span>
+                      <li key={index} className="flex items-start gap-3 text-sm text-gray-600 dark:text-gray-300 p-2.5 rounded-lg border border-gray-100 dark:border-[#30363d] bg-gray-50/50 dark:bg-[#21262d]/50">
+                        <span className="text-blue-500 font-bold mt-0.5 shrink-0">→</span>
                         <span>{insight}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               ) : (
-                <div className="flex-grow flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl">
-                   <p className="text-sm font-medium">Awaiting Data to Generate Plan...</p>
+                <div className="flex-grow flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500 border border-dashed border-gray-200 dark:border-[#30363d] rounded-lg bg-gray-50/50 dark:bg-[#0d1117]/50">
+                   <p className="text-sm">Run prediction to generate plan.</p>
                 </div>
               )}
             </div>
 
             {/* AI CHAT ASSISTANT - ALWAYS VISIBLE */}
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-6 flex flex-col">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
-                <MessageSquare className={prediction !== null ? "text-indigo-500 w-5 h-5" : "text-gray-400 dark:text-gray-500 w-5 h-5"} /> Ask AI Advisor
+            <div className={`${cardClass} p-5 flex flex-col`}>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <MessageSquare className={prediction !== null ? "text-blue-500 w-4 h-4" : "text-gray-400 dark:text-gray-600 w-4 h-4"} /> AI Advisor
               </h3>
               
               {prediction !== null ? (
                 <>
-                  {/* Chat History Box - FIXED HEIGHT AND SCROLLBAR */}
-                  <div className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 flex flex-col h-[180px] min-h-[180px] max-h-[180px] overflow-y-auto mb-4 border border-gray-100 dark:border-slate-700/50" style={{ scrollbarWidth: 'thin', scrollbarColor: '#818cf8 transparent' }}>
+                  <div className="bg-gray-50 dark:bg-[#0d1117] rounded-lg p-3 flex flex-col h-[160px] min-h-[160px] max-h-[160px] overflow-y-auto mb-3 border border-gray-200 dark:border-[#30363d]" style={{ scrollbarWidth: 'thin' }}>
                     {chatHistory.length === 0 ? (
-                      <div className="m-auto text-sm text-gray-400 dark:text-gray-500 text-center italic">
-                        "Have a specific question about your stats? Ask me anything!"
+                      <div className="m-auto text-xs text-gray-500 dark:text-gray-400 text-center">
+                        Ask a question about your metrics.
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {chatHistory.map((msg, idx) => (
                           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`text-sm px-4 py-2 rounded-2xl max-w-[85%] shadow-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm border border-gray-200 dark:border-slate-600'}`}>
+                            <div className={`text-xs px-3 py-2 rounded-lg max-w-[85%] ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-[#21262d] text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-[#30363d]'}`}>
                               {msg.text}
                             </div>
                           </div>
                         ))}
                         {isChatLoading && (
                            <div className="flex justify-start">
-                             <div className="text-sm px-4 py-2 rounded-2xl bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm animate-pulse border border-gray-200 dark:border-slate-600">
+                             <div className="text-xs px-3 py-2 rounded-lg bg-white dark:bg-[#21262d] text-gray-500 border border-gray-200 dark:border-[#30363d] animate-pulse">
                                Thinking...
                              </div>
                            </div>
@@ -394,46 +399,33 @@ const App = () => {
                     )}
                   </div>
 
-                  {/* Chat Input Field */}
                   <form onSubmit={handleChatSubmit} className="relative mt-auto">
                     <input 
                       type="text" 
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      placeholder={`How do I improve my ${formData.Branch} grades?`} 
-                      className={`w-full pl-4 pr-12 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm ${isDarkMode ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/80 border-gray-200 text-gray-900 placeholder-gray-400 shadow-sm'}`}
+                      placeholder={`Improve ${formData.Branch} grades?`} 
+                      className={`w-full pl-3 pr-10 py-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${isDarkMode ? 'bg-[#0d1117] border-[#30363d] text-gray-200 placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'}`}
                       disabled={isChatLoading}
                     />
                     <button 
                       type="submit" 
                       disabled={isChatLoading || !chatInput.trim()}
-                      className="absolute right-2 top-2 p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                      className="absolute right-1.5 top-1.5 p-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Send size={18} />
+                      <Send size={14} />
                     </button>
                   </form>
                 </>
               ) : (
                 <>
-                  {/* Chat Placeholder Box - MATCHING FIXED HEIGHT */}
-                  <div className="flex flex-col items-center justify-center h-[180px] min-h-[180px] max-h-[180px] text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl mb-4">
-                    <MessageSquare size={32} className="mb-3 opacity-50" />
-                    <p className="text-sm font-medium px-6 text-center">Run a prediction to unlock the AI Chat Assistant.</p>
+                  <div className="flex flex-col items-center justify-center h-[160px] min-h-[160px] max-h-[160px] text-gray-400 dark:text-gray-500 border border-dashed border-gray-200 dark:border-[#30363d] rounded-lg mb-3 bg-gray-50/50 dark:bg-[#0d1117]/50">
+                    <MessageSquare size={24} className="mb-2 opacity-50" />
+                    <p className="text-xs px-4 text-center">Predict to unlock Chat.</p>
                   </div>
-                  {/* Disabled Chat Input */}
                   <div className="relative mt-auto">
-                    <input 
-                      type="text" 
-                      disabled
-                      placeholder="Awaiting data..." 
-                      className={`w-full pl-4 pr-12 py-3 rounded-xl border outline-none transition-all text-sm opacity-60 cursor-not-allowed ${isDarkMode ? 'bg-slate-800/30 border-slate-700 text-gray-500' : 'bg-gray-50 border-gray-200 text-gray-400'}`}
-                    />
-                    <button 
-                      disabled
-                      className="absolute right-2 top-2 p-1.5 rounded-lg bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 transition-all opacity-50 cursor-not-allowed"
-                    >
-                      <Send size={18} />
-                    </button>
+                    <input type="text" disabled placeholder="Disabled" className={`w-full pl-3 pr-10 py-2.5 rounded-lg border text-sm outline-none cursor-not-allowed ${isDarkMode ? 'bg-[#21262d]/50 border-[#30363d] text-gray-600' : 'bg-gray-100 border-gray-200 text-gray-400'}`} />
+                    <button disabled className="absolute right-1.5 top-1.5 p-1.5 rounded-md bg-gray-300 dark:bg-[#30363d] text-gray-500 transition-colors opacity-50 cursor-not-allowed"><Send size={14} /></button>
                   </div>
                 </>
               )}
@@ -442,9 +434,9 @@ const App = () => {
           </div>
         </div>
         
-        <footer className="col-span-full w-full mt-12 pt-6 pb-8 border-t border-gray-200 dark:border-slate-700/50 text-center">
-          <p className="text-gray-500 dark:text-slate-400 text-sm tracking-wide">
-            Designed & Built by <span className="text-purple-600 dark:text-purple-400 font-semibold">BIT-BY-BIT Team</span>
+        <footer className="col-span-full w-full mt-12 pt-6 pb-8 border-t border-gray-200 dark:border-[#30363d] text-center">
+          <p className="text-gray-500 dark:text-gray-400 text-xs">
+            Designed & Built by <span className="font-semibold text-gray-900 dark:text-gray-200">Aaditya Jaysawal</span>
           </p>
         </footer>
       </div>
@@ -452,29 +444,26 @@ const App = () => {
   );
 };
 
-// ... (Rest of your components like Section, InputField, SelectField, SliderField, AuthScreen remain unchanged)
-
-
 // --- REUSABLE COMPONENTS ---
 const Section = ({ title, children, isDark }) => (
   <div>
-    <h3 className={`text-sm font-bold uppercase tracking-widest mb-4 pb-2 border-b ${isDark ? 'text-indigo-400 border-slate-700' : 'text-indigo-600 border-indigo-100'}`}>{title}</h3>
+    <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 pb-2 border-b ${isDark ? 'text-gray-400 border-[#30363d]' : 'text-gray-500 border-gray-200'}`}>{title}</h3>
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{children}</div>
   </div>
 );
 
 const InputField = ({ label, name, value, onChange, isDark, min, max }) => (
   <div className="flex flex-col">
-    <label className={`text-xs font-semibold mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{label}</label>
-    <input type="number" name={name} value={value} onChange={onChange} min={min} max={max} className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`} />
+    <label className={`text-xs font-medium mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{label}</label>
+    <input type="number" name={name} value={value} onChange={onChange} min={min} max={max} className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200 placeholder-gray-600' : 'bg-gray-50 border-gray-300 text-gray-900'}`} />
   </div>
 );
 
 const SelectField = ({ label, name, value, onChange, options, isDark }) => (
   <div className="flex flex-col">
-    <label className={`text-xs font-semibold mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{label}</label>
-    <select name={name} value={value} onChange={onChange} className={`w-full p-2.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm appearance-none cursor-pointer ${isDark ? 'bg-slate-800/50 border-slate-600 text-white focus:border-indigo-500' : 'bg-white/50 border-gray-200 text-gray-900 focus:border-indigo-400 shadow-sm'}`}>
-      {options.map(opt => <option key={opt} value={opt} className={isDark ? "bg-slate-800" : ""}>{opt}</option>)}
+    <label className={`text-xs font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{label}</label>
+    <select name={name} value={value} onChange={onChange} className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors appearance-none cursor-pointer ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
+      {options.map(opt => <option key={opt} value={opt} className={isDark ? "bg-[#161b22]" : ""}>{opt}</option>)}
     </select>
   </div>
 );
@@ -482,10 +471,10 @@ const SelectField = ({ label, name, value, onChange, options, isDark }) => (
 const SliderField = ({ label, name, value, onChange, min, max, isDark }) => (
   <div className="flex flex-col">
     <div className="flex justify-between items-center mb-2">
-      <label className={`text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{label}</label>
-      <span className={`px-2 py-1 rounded-md text-xs font-bold ${isDark ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-100 text-indigo-700'}`}>{value}</span>
+      <label className={`text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{label}</label>
+      <span className={`px-2 py-0.5 rounded text-xs font-semibold ${isDark ? 'bg-[#21262d] text-gray-300' : 'bg-gray-100 text-gray-700'}`}>{value}</span>
     </div>
-    <input type="range" name={name} min={min} max={max} value={value} onChange={onChange} className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-indigo-500 bg-gray-200 dark:bg-slate-700" />
+    <input type="range" name={name} min={min} max={max} value={value} onChange={onChange} className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-500 bg-gray-200 dark:bg-[#30363d]" />
   </div>
 );
 
@@ -512,8 +501,8 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
       }
     } catch (err) {
       let cleanError = err.message;
-      if (cleanError.includes('email-already-in-use')) cleanError = 'This email is already registered. Try logging in!';
-      if (cleanError.includes('invalid-credential')) cleanError = 'Incorrect email or password. Try again.';
+      if (cleanError.includes('email-already-in-use')) cleanError = 'Email already registered.';
+      if (cleanError.includes('invalid-credential')) cleanError = 'Incorrect email or password.';
       if (cleanError.includes('weak-password')) cleanError = 'Password must be at least 6 characters.';
       setAuthError(cleanError);
     } finally {
@@ -522,76 +511,75 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 font-sans p-4 flex items-center justify-center
-      ${isDark ? 'bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100'}`}>
+    <div className={`min-h-screen transition-colors duration-300 font-sans p-4 flex items-center justify-center
+      ${isDark ? 'bg-[#0d1117]' : 'bg-[#f6f8fa]'}`}>
       
       <div className="absolute top-6 right-6">
-        <button onClick={toggleTheme} className="p-3 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-gray-200 dark:border-slate-700 shadow-sm hover:scale-105 transition-all text-gray-800 dark:text-gray-200">
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        <button onClick={toggleTheme} className="p-2 rounded-md border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#21262d] hover:bg-gray-50 dark:hover:bg-[#30363d] transition-colors text-gray-700 dark:text-gray-300">
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
       </div>
 
-      <div className="w-full max-w-md bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-slate-700/50 shadow-2xl rounded-3xl p-8 relative overflow-hidden animate-fade-in-up">
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50"></div>
+      <div className="w-full max-w-sm bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] shadow-sm rounded-2xl p-8 relative animate-fade-in-up">
         
         <div className="flex justify-center mb-6">
-          <div className="p-4 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/30 text-white">
-            <BrainCircuit size={40} />
+          <div className="p-3 bg-blue-600 rounded-lg text-white">
+            <BrainCircuit size={32} />
           </div>
         </div>
         
-        <h2 className="text-3xl font-extrabold text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-          {isLoginView ? 'Welcome Back' : 'Create Account'}
+        <h2 className="text-xl font-semibold text-center mb-2 text-gray-900 dark:text-gray-100">
+          {isLoginView ? 'Sign in to Predictor' : 'Create an account'}
         </h2>
         <p className="text-center text-gray-500 dark:text-gray-400 mb-6 text-sm">
-          {isLoginView ? 'Enter your details to access the Predictor.' : 'Sign up to analyze student performance.'}
+          {isLoginView ? 'Welcome back.' : 'Join to analyze performance.'}
         </p>
 
         {authError && (
-          <div className="mb-4 p-3 bg-red-100/50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl text-center text-sm font-semibold text-red-600 dark:text-red-400">
+          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg text-center text-sm font-medium text-red-600 dark:text-red-400">
             {authError}
           </div>
         )}
 
-        <form onSubmit={handleAuthSubmit} className="space-y-5">
+        <form onSubmit={handleAuthSubmit} className="space-y-4">
           {!isLoginView && (
-            <div className="relative">
-              <User className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
-              <input type="text" placeholder="Full Name" required
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
+              <input type="text" required
                 value={name} onChange={(e) => setName(e.target.value)}
-                className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
-                  ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+                className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors
+                  ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`} />
             </div>
           )}
           
-          <div className="relative">
-            <Mail className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
-            <input type="email" placeholder="Email Address" required
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email address</label>
+            <input type="email" required
               value={email} onChange={(e) => setEmail(e.target.value)}
-              className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
-                ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+              className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors
+                ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`} />
           </div>
 
-          <div className="relative">
-            <Lock className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
-            <input type="password" placeholder="Password" required
+          <div>
+             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
+            <input type="password" required
               value={password} onChange={(e) => setPassword(e.target.value)}
-              className={`w-full pl-10 p-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 outline-none transition-all backdrop-blur-sm
-                ${isDark ? 'bg-slate-800/50 border-slate-600 text-white placeholder-gray-500' : 'bg-white/50 border-gray-200 text-gray-900'}`} />
+              className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors
+                ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`} />
           </div>
 
           <button type="submit" disabled={authLoading}
-            className={`w-full py-3.5 rounded-xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all flex justify-center items-center gap-2 mt-2
-              ${authLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-95'}`}
+            className={`w-full py-2.5 mt-2 rounded-lg font-semibold text-sm text-white transition-colors flex justify-center items-center gap-2
+              ${authLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-[#1f883d] hover:bg-[#1a7f37] dark:bg-[#238636] dark:hover:bg-[#2ea043]'}`}
           >
-            {authLoading ? <span className="animate-pulse">Loading...</span> : <>{isLoginView ? 'Sign In' : 'Sign Up'} <ArrowRight size={18} /></>}
+            {authLoading ? <span className="animate-pulse">Loading...</span> : <>{isLoginView ? 'Sign in' : 'Sign up'}</>}
           </button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-          {isLoginView ? "Don't have an account? " : "Already have an account? "}
-          <button type="button" onClick={() => { setIsLoginView(!isLoginView); setAuthError(''); }} className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
-            {isLoginView ? 'Sign up' : 'Log in'}
+        <div className="mt-6 p-4 border border-gray-200 dark:border-[#30363d] rounded-lg text-center text-sm text-gray-600 dark:text-gray-400">
+          {isLoginView ? "New to Predictor? " : "Already have an account? "}
+          <button type="button" onClick={() => { setIsLoginView(!isLoginView); setAuthError(''); }} className="text-blue-600 dark:text-blue-500 font-medium hover:underline">
+            {isLoginView ? 'Create an account' : 'Sign in'}
           </button>
         </div>
       </div>
