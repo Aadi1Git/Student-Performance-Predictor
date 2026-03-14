@@ -93,7 +93,7 @@ const App = () => {
     try {
       const element = reportRef.current;
       const canvas = await html2canvas(element, {
-        scale: 2, backgroundColor: isDarkMode ? '#0d1117' : '#f6f8fa',
+        scale: 2, backgroundColor: isDarkMode ? '#09090b' : '#fafafa',
         windowWidth: element.scrollWidth, windowHeight: element.scrollHeight
       });
       const imgData = canvas.toDataURL('image/png');
@@ -126,7 +126,7 @@ const App = () => {
         if (rawAiText) {
           cleanInsights = rawAiText.split('\n').filter(line => line.trim().length > 0).map(line => line.replace(/^-\s*/, '').replace(/^\*\s*/, '').trim());
         }
-        if (cleanInsights.length === 0) cleanInsights.push("Keep up the fantastic work!");
+        if (cleanInsights.length === 0) cleanInsights.push("Keep up the consistent effort.");
         setInsights(cleanInsights); 
       }, 500);
     } catch (err) {
@@ -154,7 +154,7 @@ const App = () => {
       
       setChatHistory([...newChatHistory, { role: 'ai', text: response.data.answer }]);
     } catch (err) {
-      setChatHistory([...newChatHistory, { role: 'ai', text: "Sorry, I couldn't process that right now. Try again later!" }]);
+      setChatHistory([...newChatHistory, { role: 'ai', text: "Service temporarily unavailable." }]);
     } finally {
       setIsChatLoading(false);
     }
@@ -177,20 +177,20 @@ const App = () => {
     { subject: 'Activity', value: formData.Participation_Score * 10 }
   ];
 
-  if (authChecking) return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] dark:bg-[#0d1117]"><BrainCircuit className="animate-spin text-blue-600 dark:text-blue-500 w-10 h-10" /></div>;
+  if (authChecking) return <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950"><BrainCircuit className="animate-spin text-zinc-900 dark:text-zinc-50 w-8 h-8" /></div>;
 
   if (!isAuthenticated) return <AuthScreen isLoginView={isLoginView} setIsLoginView={setIsLoginView} isDark={isDarkMode} toggleTheme={() => setIsDarkMode(!isDarkMode)} />;
 
   if (currentUser && !currentUser.emailVerified) {
     return (
-      <div className={`min-h-screen transition-colors duration-300 font-sans p-4 flex items-center justify-center ${isDarkMode ? 'bg-[#0d1117]' : 'bg-[#f6f8fa]'}`}>
-        <div className="max-w-md w-full bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] shadow-sm rounded-2xl p-8 text-center animate-fade-in-up">
-          <div className="flex justify-center mb-6"><div className="p-4 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl text-yellow-600 dark:text-yellow-500"><Mail size={32} /></div></div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Check Your Inbox</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 text-sm">We sent a secure verification link to <br/><span className="font-bold text-gray-900 dark:text-gray-200">{currentUser.email}</span>. <br/><br/>Please click the link to verify your account.</p>
+      <div className={`min-h-screen transition-colors duration-300 font-sans p-4 flex items-center justify-center ${isDarkMode ? 'bg-zinc-950 text-zinc-50' : 'bg-zinc-50 text-zinc-900'}`}>
+        <div className="max-w-md w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl p-8 text-center animate-fade-in-up">
+          <div className="flex justify-center mb-6"><div className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded-full text-zinc-900 dark:text-zinc-50"><Mail size={24} /></div></div>
+          <h2 className="text-xl font-bold tracking-tight mb-2">Check your email</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mb-8 text-sm">A verification link has been sent to <br/><span className="font-semibold text-zinc-900 dark:text-zinc-50">{currentUser.email}</span>.</p>
           <div className="space-y-3">
-            <button onClick={() => window.location.reload()} className="w-full py-2.5 rounded-lg font-semibold text-white transition-colors bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500">I've Verified My Email</button>
-            <button onClick={handleLogout} className="w-full py-2.5 rounded-lg font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-[#30363d] hover:bg-gray-50 dark:hover:bg-[#21262d] transition-colors">Log Out</button>
+            <button onClick={() => window.location.reload()} className="w-full py-2.5 rounded-lg font-semibold text-white bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors">I verified my email</button>
+            <button onClick={handleLogout} className="w-full py-2.5 rounded-lg font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">Log Out</button>
           </div>
         </div>
       </div>
@@ -199,28 +199,29 @@ const App = () => {
 
   const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Student';
 
-  // THEME VARIABLES
-  const cardClass = "bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-xl shadow-sm";
-  const primaryColor = isDarkMode ? '#3b82f6' : '#2563eb'; // blue-500 : blue-600
+  // THEME VARIABLES FOR MOBBIN AESTHETIC
+  const cardClass = "bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm";
+  const primaryChartColor = isDarkMode ? '#fafafa' : '#18181b'; // zinc-50 : zinc-900
+  const secondaryChartColor = isDarkMode ? '#27272a' : '#e4e4e7'; // zinc-800 : zinc-200
 
   return (
     <div className={`min-h-screen transition-colors duration-300 font-sans p-4 sm:p-8 flex items-center justify-center
-      ${isDarkMode ? 'bg-[#0d1117] text-gray-200' : 'bg-[#f6f8fa] text-gray-900'}`}>
+      ${isDarkMode ? 'bg-zinc-950 text-zinc-50' : 'bg-zinc-50 text-zinc-900'}`}>
       
       <div className="max-w-7xl w-full mx-auto animate-fade-in-up">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8 pb-6 border-b border-gray-200 dark:border-[#30363d]">
+        <div className="flex justify-between items-center mb-8 pb-6 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-blue-600 rounded-lg text-white"><BrainCircuit size={24} /></div>
+            <div className="p-2 bg-zinc-900 dark:bg-zinc-50 rounded text-white dark:text-zinc-900"><BrainCircuit size={20} strokeWidth={2.5} /></div>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
-                Performance Predictor
+              <h1 className="text-xl font-bold tracking-tight">
+                Predictor
               </h1>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={handleLogout} className="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#21262d] hover:bg-gray-50 dark:hover:bg-[#30363d] transition-colors text-gray-700 dark:text-gray-300">Log Out</button>
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-md border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#21262d] hover:bg-gray-50 dark:hover:bg-[#30363d] transition-colors text-gray-700 dark:text-gray-300">
+            <button onClick={handleLogout} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">Log Out</button>
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors text-zinc-700 dark:text-zinc-300">
               {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>
@@ -233,15 +234,15 @@ const App = () => {
             <div className={`${cardClass} p-6 sm:p-8 flex-grow flex flex-col`}>
               <form onSubmit={handleSubmit} className="space-y-8 h-full flex flex-col">
                 <Section title="Academic Metrics" isDark={isDarkMode}>
-                  <InputField label="Midterm (0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
-                  <InputField label="Assignments (0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
-                  <InputField label="Quizzes (0-10)" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
-                  <InputField label="Projects (0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
+                  <InputField label="Midterm" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
+                  <InputField label="Assignments" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                  <InputField label="Quizzes" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                  <InputField label="Projects" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
                 </Section>
-                <Section title="Habits & Engagement" isDark={isDarkMode}>
-                  <InputField label="Study Hrs (0-70)" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
-                  <InputField label="Sleep Hrs/Nt" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} min={0} max={24} />
-                  <InputField label="Participation (0-10)" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                <Section title="Habits" isDark={isDarkMode}>
+                  <InputField label="Study Hrs" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
+                  <InputField label="Sleep Hrs" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} min={0} max={24} />
+                  <InputField label="Participation" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
                   <SelectField label="Internet" name="Internet_Access" value={formData.Internet_Access} onChange={handleChange} isDark={isDarkMode} options={['Yes', 'No']} />
                 </Section>
                 <Section title="Demographics" isDark={isDarkMode}>
@@ -251,15 +252,15 @@ const App = () => {
                   <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
                 </Section>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2 flex-grow">
-                  <SliderField label="Attendance (%)" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
-                  <SliderField label="Stress Level (0-10)" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
+                  <SliderField label="Attendance" name="Attendance" value={formData.Attendance} onChange={handleChange} min={0} max={100} isDark={isDarkMode} />
+                  <SliderField label="Stress Level" name="Stress_Level" value={formData.Stress_Level} onChange={handleChange} min={0} max={10} isDark={isDarkMode} />
                 </div>
                 
                 <div className="pt-4 mt-auto">
-                  <button type="submit" disabled={loading} className={`w-full py-3 rounded-lg font-semibold text-sm text-white transition-colors flex justify-center items-center gap-2 ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 dark:bg-green-600 dark:hover:bg-green-500'}`}>
-                    {loading ? <span className="animate-pulse">Analyzing Data...</span> : <>Predict Future Performance</>}
+                  <button type="submit" disabled={loading} className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-colors flex justify-center items-center gap-2 ${loading ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-900'}`}>
+                    {loading ? <span className="animate-pulse">Processing...</span> : <>Predict Performance</>}
                   </button>
-                  {error && <p className="text-red-600 dark:text-red-400 text-sm text-center font-medium mt-3">{error}</p>}
+                  {error && <p className="text-red-500 text-sm text-center font-medium mt-3">{error}</p>}
                 </div>
               </form>
             </div>
@@ -267,31 +268,31 @@ const App = () => {
             {/* Graphs Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-auto">
               <div className={`${cardClass} p-5`}>
-                <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider">Class Comparison</h3>
+                <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-4 uppercase tracking-widest">Comparison</h3>
                 <div className="h-48 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-                      <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#8b949e' : '#6e7781', fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: isDarkMode ? '#8b949e' : '#6e7781', fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip cursor={{ fill: isDarkMode ? '#21262d' : '#f3f4f6' }} contentStyle={{ backgroundColor: isDarkMode ? '#161b22' : '#ffffff', borderRadius: '8px', border: `1px solid ${isDarkMode ? '#30363d' : '#e5e7eb'}`, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
+                      <XAxis dataKey="subject" tick={{ fill: isDarkMode ? '#a1a1aa' : '#52525b', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: isDarkMode ? '#a1a1aa' : '#52525b', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <Tooltip cursor={{ fill: isDarkMode ? '#27272a' : '#f4f4f5' }} contentStyle={{ backgroundColor: isDarkMode ? '#09090b' : '#ffffff', borderRadius: '8px', border: `1px solid ${isDarkMode ? '#27272a' : '#e4e4e7'}`, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }} />
                       <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }}/>
-                      <Bar dataKey="Student" fill={primaryColor} radius={[2, 2, 0, 0]} />
-                      <Bar dataKey="Average" fill={isDarkMode ? '#30363d' : '#e5e7eb'} radius={[2, 2, 0, 0]} />
+                      <Bar dataKey="Student" fill={primaryChartColor} radius={[2, 2, 0, 0]} />
+                      <Bar dataKey="Average" fill={secondaryChartColor} radius={[2, 2, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
               <div className={`${cardClass} p-5`}>
-                <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wider">Profile Shape</h3>
+                <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-4 uppercase tracking-widest">Shape</h3>
                 <div className="h-48 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                      <PolarGrid stroke={isDarkMode ? '#30363d' : '#e5e7eb'} />
-                      <PolarAngleAxis dataKey="subject" tick={{ fill: isDarkMode ? '#8b949e' : '#6e7781', fontSize: 10 }} />
+                      <PolarGrid stroke={isDarkMode ? '#27272a' : '#e4e4e7'} />
+                      <PolarAngleAxis dataKey="subject" tick={{ fill: isDarkMode ? '#a1a1aa' : '#52525b', fontSize: 10 }} />
                       <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                      <Radar name="Score" dataKey="value" stroke={primaryColor} fill={primaryColor} fillOpacity={0.3} />
-                      <Tooltip contentStyle={{ backgroundColor: isDarkMode ? '#161b22' : '#ffffff', borderRadius: '8px', border: `1px solid ${isDarkMode ? '#30363d' : '#e5e7eb'}`, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
+                      <Radar name="Score" dataKey="value" stroke={primaryChartColor} fill={primaryChartColor} fillOpacity={0.15} />
+                      <Tooltip contentStyle={{ backgroundColor: isDarkMode ? '#09090b' : '#ffffff', borderRadius: '8px', border: `1px solid ${isDarkMode ? '#27272a' : '#e4e4e7'}`, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }} />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
@@ -304,17 +305,17 @@ const App = () => {
             
             <div className={`${cardClass} p-4 flex justify-between items-center`}>
                <div>
-                 <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                   <Award className="text-blue-600 dark:text-blue-500 w-4 h-4" /> Performance Report
+                 <h3 className="text-sm font-bold flex items-center gap-2">
+                   <Award className="w-4 h-4" /> Report
                  </h3>
-                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 ml-6">
-                   Student: <span className="text-gray-900 dark:text-gray-200 font-medium">{userName}</span>
+                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 ml-6">
+                   <span className="font-semibold text-zinc-900 dark:text-zinc-50">{userName}</span>
                  </p>
                </div>
                
                {prediction !== null && (
-                 <button onClick={handleDownloadPDF} disabled={isDownloading} className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium border rounded-md transition-colors ${isDownloading ? 'bg-gray-100 dark:bg-[#21262d] text-gray-400 cursor-not-allowed border-transparent' : 'bg-white dark:bg-[#21262d] border-gray-300 dark:border-[#30363d] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#30363d]'}`}>
-                   {isDownloading ? <span className="animate-pulse">Generating...</span> : <><Download size={14} /> PDF</>}
+                 <button onClick={handleDownloadPDF} disabled={isDownloading} className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium border rounded-md transition-colors ${isDownloading ? 'bg-zinc-100 dark:bg-zinc-900 text-zinc-400 border-transparent cursor-not-allowed' : 'bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900'}`}>
+                   {isDownloading ? <span className="animate-pulse">Generating</span> : <><Download size={14} /> Download</>}
                  </button>
                )}
             </div>
@@ -324,73 +325,73 @@ const App = () => {
               {prediction !== null ? (
                 <div className="relative flex items-center justify-center animate-fade-in-up">
                   <svg className="w-40 h-40 transform -rotate-90">
-                    <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-gray-100 dark:text-[#21262d]" />
-                    <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="440" strokeDashoffset={440 - (prediction / 100) * 440} strokeLinecap="round" className={`transition-all duration-1500 ease-out ${prediction >= 80 ? 'text-green-500' : prediction >= 60 ? 'text-yellow-500' : 'text-red-500'}`} />
+                    <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-zinc-100 dark:text-zinc-900" />
+                    <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="6" fill="transparent" strokeDasharray="440" strokeDashoffset={440 - (prediction / 100) * 440} strokeLinecap="round" className="text-zinc-900 dark:text-zinc-50 transition-all duration-1500 ease-out" />
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-4xl font-bold text-gray-900 dark:text-gray-100">{prediction.toFixed(1)}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1 uppercase tracking-widest">Score</span>
+                    <span className="text-4xl font-black">{prediction.toFixed(1)}</span>
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold mt-1 uppercase tracking-widest">Score</span>
                   </div>
                 </div>
               ) : (
-                <div className="text-center text-gray-400 dark:text-gray-600 flex flex-col items-center">
-                  <div className="w-32 h-32 border-4 border-dashed border-gray-200 dark:border-[#30363d] rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
-                    <BrainCircuit size={32} className="opacity-50" />
+                <div className="text-center text-zinc-400 dark:text-zinc-600 flex flex-col items-center">
+                  <div className="w-32 h-32 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
+                    <BrainCircuit size={28} className="opacity-40" />
                   </div>
-                  <p className="mt-4 text-sm font-medium">Awaiting Input Data</p>
+                  <p className="mt-4 text-xs font-medium uppercase tracking-widest">Awaiting Data</p>
                 </div>
               )}
             </div>
 
             {/* AI Action Plan - ALWAYS VISIBLE, FIXED HEIGHT */}
             <div className={`${cardClass} p-5 flex flex-col h-[280px] min-h-[280px]`}>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2 shrink-0">
-                <Lightbulb className={prediction !== null ? "text-yellow-500 w-4 h-4" : "text-gray-400 dark:text-gray-600 w-4 h-4"} /> Action Plan
+              <h3 className="text-sm font-bold mb-4 flex items-center gap-2 shrink-0">
+                <Lightbulb className="w-4 h-4" /> Plan
               </h3>
               
               {prediction !== null ? (
-                <div className="flex-grow overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: isDarkMode ? '#4b5563 transparent' : '#d1d5db transparent' }}>
+                <div className="flex-grow overflow-y-auto pr-2" style={{ scrollbarWidth: 'none' }}>
                   <ul className="space-y-2">
                     {insights.map((insight, index) => (
-                      <li key={index} className="flex items-start gap-3 text-sm text-gray-600 dark:text-gray-300 p-2.5 rounded-lg border border-gray-100 dark:border-[#30363d] bg-gray-50/50 dark:bg-[#21262d]/50">
-                        <span className="text-blue-500 font-bold mt-0.5 shrink-0">→</span>
-                        <span>{insight}</span>
+                      <li key={index} className="flex items-start gap-3 text-sm p-3 rounded-lg border border-zinc-100 dark:border-zinc-800/50 bg-zinc-50 dark:bg-zinc-900/30">
+                        <span className="font-bold mt-0.5 shrink-0 text-zinc-400 dark:text-zinc-500">→</span>
+                        <span className="text-zinc-600 dark:text-zinc-300">{insight}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               ) : (
-                <div className="flex-grow flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500 border border-dashed border-gray-200 dark:border-[#30363d] rounded-lg bg-gray-50/50 dark:bg-[#0d1117]/50">
-                   <p className="text-sm">Run prediction to generate plan.</p>
+                <div className="flex-grow flex flex-col items-center justify-center py-8 text-zinc-400 dark:text-zinc-600 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50/50 dark:bg-zinc-900/20">
+                   <p className="text-xs">Run prediction to view plan.</p>
                 </div>
               )}
             </div>
 
             {/* AI CHAT ASSISTANT - ALWAYS VISIBLE */}
             <div className={`${cardClass} p-5 flex flex-col`}>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-                <MessageSquare className={prediction !== null ? "text-blue-500 w-4 h-4" : "text-gray-400 dark:text-gray-600 w-4 h-4"} /> AI Advisor
+              <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" /> Advisor
               </h3>
               
               {prediction !== null ? (
                 <>
-                  <div className="bg-gray-50 dark:bg-[#0d1117] rounded-lg p-3 flex flex-col h-[160px] min-h-[160px] max-h-[160px] overflow-y-auto mb-3 border border-gray-200 dark:border-[#30363d]" style={{ scrollbarWidth: 'thin' }}>
+                  <div className="bg-zinc-50 dark:bg-zinc-900/30 rounded-lg p-3 flex flex-col h-[160px] min-h-[160px] max-h-[160px] overflow-y-auto mb-3 border border-zinc-200 dark:border-zinc-800/50" style={{ scrollbarWidth: 'none' }}>
                     {chatHistory.length === 0 ? (
-                      <div className="m-auto text-xs text-gray-500 dark:text-gray-400 text-center">
-                        Ask a question about your metrics.
+                      <div className="m-auto text-xs text-zinc-500 dark:text-zinc-400 text-center">
+                        Ask a question regarding your metrics.
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {chatHistory.map((msg, idx) => (
                           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`text-xs px-3 py-2 rounded-lg max-w-[85%] ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-[#21262d] text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-[#30363d]'}`}>
+                            <div className={`text-xs px-3 py-2 rounded-lg max-w-[85%] ${msg.role === 'user' ? 'bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900 font-medium' : 'bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300'}`}>
                               {msg.text}
                             </div>
                           </div>
                         ))}
                         {isChatLoading && (
                            <div className="flex justify-start">
-                             <div className="text-xs px-3 py-2 rounded-lg bg-white dark:bg-[#21262d] text-gray-500 border border-gray-200 dark:border-[#30363d] animate-pulse">
+                             <div className="text-xs px-3 py-2 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-500 animate-pulse">
                                Thinking...
                              </div>
                            </div>
@@ -404,14 +405,14 @@ const App = () => {
                       type="text" 
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      placeholder={`Improve ${formData.Branch} grades?`} 
-                      className={`w-full pl-3 pr-10 py-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${isDarkMode ? 'bg-[#0d1117] border-[#30363d] text-gray-200 placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'}`}
+                      placeholder="Type a message..." 
+                      className="w-full pl-3 pr-10 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors placeholder-zinc-400 dark:placeholder-zinc-600"
                       disabled={isChatLoading}
                     />
                     <button 
                       type="submit" 
                       disabled={isChatLoading || !chatInput.trim()}
-                      className="absolute right-1.5 top-1.5 p-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="absolute right-1.5 top-1.5 p-1.5 rounded-md bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <Send size={14} />
                     </button>
@@ -419,13 +420,13 @@ const App = () => {
                 </>
               ) : (
                 <>
-                  <div className="flex flex-col items-center justify-center h-[160px] min-h-[160px] max-h-[160px] text-gray-400 dark:text-gray-500 border border-dashed border-gray-200 dark:border-[#30363d] rounded-lg mb-3 bg-gray-50/50 dark:bg-[#0d1117]/50">
-                    <MessageSquare size={24} className="mb-2 opacity-50" />
-                    <p className="text-xs px-4 text-center">Predict to unlock Chat.</p>
+                  <div className="flex flex-col items-center justify-center h-[160px] min-h-[160px] max-h-[160px] text-zinc-400 dark:text-zinc-600 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg mb-3 bg-zinc-50/50 dark:bg-zinc-900/20">
+                    <MessageSquare size={20} className="mb-2 opacity-40" />
+                    <p className="text-xs px-4 text-center">Predict to unlock advisor.</p>
                   </div>
                   <div className="relative mt-auto">
-                    <input type="text" disabled placeholder="Disabled" className={`w-full pl-3 pr-10 py-2.5 rounded-lg border text-sm outline-none cursor-not-allowed ${isDarkMode ? 'bg-[#21262d]/50 border-[#30363d] text-gray-600' : 'bg-gray-100 border-gray-200 text-gray-400'}`} />
-                    <button disabled className="absolute right-1.5 top-1.5 p-1.5 rounded-md bg-gray-300 dark:bg-[#30363d] text-gray-500 transition-colors opacity-50 cursor-not-allowed"><Send size={14} /></button>
+                    <input type="text" disabled placeholder="Unavailable" className="w-full pl-3 pr-10 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 text-sm outline-none cursor-not-allowed placeholder-zinc-300 dark:placeholder-zinc-700" />
+                    <button disabled className="absolute right-1.5 top-1.5 p-1.5 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-400 transition-colors opacity-50 cursor-not-allowed"><Send size={14} /></button>
                   </div>
                 </>
               )}
@@ -434,9 +435,9 @@ const App = () => {
           </div>
         </div>
         
-        <footer className="col-span-full w-full mt-12 pt-6 pb-8 border-t border-gray-200 dark:border-[#30363d] text-center">
-          <p className="text-gray-500 dark:text-gray-400 text-xs">
-            Designed & Built by <span className="font-semibold text-gray-900 dark:text-gray-200">Aaditya Jaysawal</span>
+        <footer className="col-span-full w-full mt-12 pt-6 pb-8 border-t border-zinc-200 dark:border-zinc-800 text-center">
+          <p className="text-zinc-500 dark:text-zinc-400 text-xs">
+            Designed & Built by <span className="font-semibold text-zinc-900 dark:text-zinc-50">Aaditya Jaysawal</span>
           </p>
         </footer>
       </div>
@@ -447,34 +448,34 @@ const App = () => {
 // --- REUSABLE COMPONENTS ---
 const Section = ({ title, children, isDark }) => (
   <div>
-    <h3 className={`text-xs font-semibold uppercase tracking-wider mb-4 pb-2 border-b ${isDark ? 'text-gray-400 border-[#30363d]' : 'text-gray-500 border-gray-200'}`}>{title}</h3>
+    <h3 className="text-xs font-bold uppercase tracking-widest mb-4 pb-2 border-b text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800">{title}</h3>
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{children}</div>
   </div>
 );
 
-const InputField = ({ label, name, value, onChange, isDark, min, max }) => (
+const InputField = ({ label, name, value, onChange, min, max }) => (
   <div className="flex flex-col">
-    <label className={`text-xs font-medium mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{label}</label>
-    <input type="number" name={name} value={value} onChange={onChange} min={min} max={max} className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200 placeholder-gray-600' : 'bg-gray-50 border-gray-300 text-gray-900'}`} />
+    <label className="text-xs font-semibold mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis text-zinc-700 dark:text-zinc-300">{label}</label>
+    <input type="number" name={name} value={value} onChange={onChange} min={min} max={max} className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400" />
   </div>
 );
 
-const SelectField = ({ label, name, value, onChange, options, isDark }) => (
+const SelectField = ({ label, name, value, onChange, options }) => (
   <div className="flex flex-col">
-    <label className={`text-xs font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{label}</label>
-    <select name={name} value={value} onChange={onChange} className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors appearance-none cursor-pointer ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
-      {options.map(opt => <option key={opt} value={opt} className={isDark ? "bg-[#161b22]" : ""}>{opt}</option>)}
+    <label className="text-xs font-semibold mb-1.5 text-zinc-700 dark:text-zinc-300">{label}</label>
+    <select name={name} value={value} onChange={onChange} className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors appearance-none cursor-pointer bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+      {options.map(opt => <option key={opt} value={opt} className="bg-white dark:bg-zinc-950">{opt}</option>)}
     </select>
   </div>
 );
 
-const SliderField = ({ label, name, value, onChange, min, max, isDark }) => (
+const SliderField = ({ label, name, value, onChange, min, max }) => (
   <div className="flex flex-col">
     <div className="flex justify-between items-center mb-2">
-      <label className={`text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{label}</label>
-      <span className={`px-2 py-0.5 rounded text-xs font-semibold ${isDark ? 'bg-[#21262d] text-gray-300' : 'bg-gray-100 text-gray-700'}`}>{value}</span>
+      <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{label}</label>
+      <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300">{value}</span>
     </div>
-    <input type="range" name={name} min={min} max={max} value={value} onChange={onChange} className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-500 bg-gray-200 dark:bg-[#30363d]" />
+    <input type="range" name={name} min={min} max={max} value={value} onChange={onChange} className="w-full h-1 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-50 bg-zinc-200 dark:border-zinc-800" />
   </div>
 );
 
@@ -502,7 +503,7 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
     } catch (err) {
       let cleanError = err.message;
       if (cleanError.includes('email-already-in-use')) cleanError = 'Email already registered.';
-      if (cleanError.includes('invalid-credential')) cleanError = 'Incorrect email or password.';
+      if (cleanError.includes('invalid-credential')) cleanError = 'Incorrect credentials.';
       if (cleanError.includes('weak-password')) cleanError = 'Password must be at least 6 characters.';
       setAuthError(cleanError);
     } finally {
@@ -512,31 +513,31 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 font-sans p-4 flex items-center justify-center
-      ${isDark ? 'bg-[#0d1117]' : 'bg-[#f6f8fa]'}`}>
+      ${isDark ? 'bg-zinc-950 text-zinc-50' : 'bg-zinc-50 text-zinc-900'}`}>
       
       <div className="absolute top-6 right-6">
-        <button onClick={toggleTheme} className="p-2 rounded-md border border-gray-300 dark:border-[#30363d] bg-white dark:bg-[#21262d] hover:bg-gray-50 dark:hover:bg-[#30363d] transition-colors text-gray-700 dark:text-gray-300">
+        <button onClick={toggleTheme} className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors text-zinc-700 dark:text-zinc-300">
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
       </div>
 
-      <div className="w-full max-w-sm bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] shadow-sm rounded-2xl p-8 relative animate-fade-in-up">
+      <div className="w-full max-w-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl p-8 relative animate-fade-in-up">
         
         <div className="flex justify-center mb-6">
-          <div className="p-3 bg-blue-600 rounded-lg text-white">
-            <BrainCircuit size={32} />
+          <div className="p-2.5 bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900 rounded-lg">
+            <BrainCircuit size={24} strokeWidth={2.5} />
           </div>
         </div>
         
-        <h2 className="text-xl font-semibold text-center mb-2 text-gray-900 dark:text-gray-100">
-          {isLoginView ? 'Sign in to Predictor' : 'Create an account'}
+        <h2 className="text-xl font-bold tracking-tight text-center mb-2">
+          {isLoginView ? 'Welcome back' : 'Create an account'}
         </h2>
-        <p className="text-center text-gray-500 dark:text-gray-400 mb-6 text-sm">
-          {isLoginView ? 'Welcome back.' : 'Join to analyze performance.'}
+        <p className="text-center text-zinc-500 dark:text-zinc-400 mb-6 text-sm">
+          {isLoginView ? 'Enter your details to sign in.' : 'Start analyzing performance.'}
         </p>
 
         {authError && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg text-center text-sm font-medium text-red-600 dark:text-red-400">
+          <div className="mb-4 p-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 rounded-lg text-center text-sm font-medium text-zinc-900 dark:text-zinc-50">
             {authError}
           </div>
         )}
@@ -544,42 +545,39 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
         <form onSubmit={handleAuthSubmit} className="space-y-4">
           {!isLoginView && (
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
+              <label className="block text-xs font-semibold mb-1.5">Name</label>
               <input type="text" required
                 value={name} onChange={(e) => setName(e.target.value)}
-                className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors
-                  ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`} />
+                className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-transparent border-zinc-200 dark:border-zinc-800" />
             </div>
           )}
           
           <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email address</label>
+            <label className="block text-xs font-semibold mb-1.5">Email</label>
             <input type="email" required
               value={email} onChange={(e) => setEmail(e.target.value)}
-              className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors
-                ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`} />
+              className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-transparent border-zinc-200 dark:border-zinc-800" />
           </div>
 
           <div>
-             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
+             <label className="block text-xs font-semibold mb-1.5">Password</label>
             <input type="password" required
               value={password} onChange={(e) => setPassword(e.target.value)}
-              className={`w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors
-                ${isDark ? 'bg-[#0d1117] border-[#30363d] text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`} />
+              className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-transparent border-zinc-200 dark:border-zinc-800" />
           </div>
 
           <button type="submit" disabled={authLoading}
-            className={`w-full py-2.5 mt-2 rounded-lg font-semibold text-sm text-white transition-colors flex justify-center items-center gap-2
-              ${authLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-[#1f883d] hover:bg-[#1a7f37] dark:bg-[#238636] dark:hover:bg-[#2ea043]'}`}
+            className={`w-full py-2.5 mt-2 rounded-lg font-semibold text-sm transition-colors flex justify-center items-center gap-2
+              ${authLoading ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200'}`}
           >
             {authLoading ? <span className="animate-pulse">Loading...</span> : <>{isLoginView ? 'Sign in' : 'Sign up'}</>}
           </button>
         </form>
 
-        <div className="mt-6 p-4 border border-gray-200 dark:border-[#30363d] rounded-lg text-center text-sm text-gray-600 dark:text-gray-400">
-          {isLoginView ? "New to Predictor? " : "Already have an account? "}
-          <button type="button" onClick={() => { setIsLoginView(!isLoginView); setAuthError(''); }} className="text-blue-600 dark:text-blue-500 font-medium hover:underline">
-            {isLoginView ? 'Create an account' : 'Sign in'}
+        <div className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          {isLoginView ? "Don't have an account? " : "Already have an account? "}
+          <button type="button" onClick={() => { setIsLoginView(!isLoginView); setAuthError(''); }} className="text-zinc-900 dark:text-zinc-50 font-semibold hover:underline">
+            {isLoginView ? 'Sign up' : 'Sign in'}
           </button>
         </div>
       </div>
