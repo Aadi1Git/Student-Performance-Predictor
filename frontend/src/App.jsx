@@ -234,16 +234,16 @@ const App = () => {
             <div className={`${cardClass} p-6 sm:p-8 flex-grow flex flex-col`}>
               <form onSubmit={handleSubmit} className="space-y-8 h-full flex flex-col">
                 <Section title="Academic Metrics" isDark={isDarkMode}>
-                  <InputField label="Midterm" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
-                  <InputField label="Assignments" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
-                  <InputField label="Quizzes" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
-                  <InputField label="Projects" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
+                  <InputField label="Midterm(0-100)" name="Midterm_Score" value={formData.Midterm_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={100} />
+                  <InputField label="Assignments(0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                  <InputField label="Quizzes(0-10)" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                  <InputField label="Projects(0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
                 </Section>
                 <Section title="Habits" isDark={isDarkMode}>
-                  <InputField label="Study Hrs" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
-                  <InputField label="Sleep Hrs" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} min={0} max={24} />
-                  <InputField label="Participation" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
-                  <SelectField label="Internet" name="Internet_Access" value={formData.Internet_Access} onChange={handleChange} isDark={isDarkMode} options={['Yes', 'No']} />
+                  <InputField label="Study Hrs/Week" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
+                  <InputField label="Sleep Hrs/Night" name="Sleep_Hours_per_Night" value={formData.Sleep_Hours_per_Night} onChange={handleChange} isDark={isDarkMode} min={0} max={24} />
+                  <InputField label="Participation In Class" name="Participation_Score" value={formData.Participation_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
+                  <SelectField label="Internet Access" name="Internet_Access" value={formData.Internet_Access} onChange={handleChange} isDark={isDarkMode} options={['Yes', 'No']} />
                 </Section>
                 <Section title="Demographics" isDark={isDarkMode}>
                   <SelectField label="Branch" name="Branch" value={formData.Branch} onChange={handleChange} isDark={isDarkMode} options={['Civil', 'ECE', 'EEE', 'ME', 'CS', 'Other']} />
@@ -437,7 +437,7 @@ const App = () => {
         
         <footer className="col-span-full w-full mt-12 pt-6 pb-8 border-t border-zinc-200 dark:border-zinc-800 text-center">
           <p className="text-zinc-500 dark:text-zinc-400 text-xs">
-            Designed & Built by <span className="font-semibold text-zinc-900 dark:text-zinc-50">Aaditya Jaysawal</span>
+            Designed & Built by <span className="font-semibold text-zinc-900 dark:text-zinc-50">BIT-BY-BIT</span>
           </p>
         </footer>
       </div>
