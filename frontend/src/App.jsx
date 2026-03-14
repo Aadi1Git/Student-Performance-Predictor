@@ -215,7 +215,7 @@ const App = () => {
             <div className="p-2 bg-zinc-900 dark:bg-zinc-50 rounded text-white dark:text-zinc-900"><BrainCircuit size={20} strokeWidth={2.5} /></div>
             <div>
               <h1 className="text-xl font-bold tracking-tight">
-                Predictor
+                Student Performance Predictor
               </h1>
             </div>
           </div>
