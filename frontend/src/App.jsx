@@ -497,7 +497,7 @@ const App = () => {
   );
 };
 
-// ... YOUR REUSABLE COMPONENTS GO BELOW THIS LINE (Section, InputField, SelectField, SliderField, AuthScreen)
+// --- REUSABLE COMPONENTS ---
 const Section = ({ title, children, isDark }) => (
   <div>
     <h3 className="text-xs font-bold uppercase tracking-widest mb-4 pb-2 border-b text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800">{title}</h3>
@@ -505,7 +505,6 @@ const Section = ({ title, children, isDark }) => (
   </div>
 );
 
-// <-- Updated InputField to accept 'type' -->
 const InputField = ({ label, name, value, onChange, min, max, type = "number" }) => (
   <div className="flex flex-col">
     <label className="text-xs font-semibold mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis text-zinc-700 dark:text-zinc-300">{label}</label>
@@ -532,7 +531,6 @@ const SliderField = ({ label, name, value, onChange, min, max }) => (
   </div>
 );
 
-// --- AUTH SCREEN ---
 const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -637,6 +635,5 @@ const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
     </div>
   );
 };
-
 
 export default App;
