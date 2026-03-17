@@ -129,7 +129,7 @@ const App = () => {
               id: key,
               Score: parseFloat(item.score),
               // Convert Firebase timestamp (milliseconds) to a readable date
-              Date: new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+              Date: new Date(item.date).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }),
               StudyHours: item.studyHours
             });
           }
