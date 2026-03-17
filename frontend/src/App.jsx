@@ -48,7 +48,8 @@ const App = () => {
     Difficulty_Level: 'Medium',
     Parent_Education_Level: 'College',
     Family_Income_Level: 'Medium',
-    Internet_Access: 'Yes'
+    Internet_Access: 'Yes',
+    Hardest_Class: '' // <-- Added the new field here
   });
 
   // --- DARK MODE & FIREBASE AUTH LISTENER ---
@@ -238,6 +239,8 @@ const App = () => {
                   <InputField label="Assignments(0-10)" name="Assignments_Avg" value={formData.Assignments_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
                   <InputField label="Quizzes(0-10)" name="Quizzes_Avg" value={formData.Quizzes_Avg} onChange={handleChange} isDark={isDarkMode} min={0} max={10} />
                   <InputField label="Projects(0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
+                  {/* Added struggling subject field below */}
+                  <InputField label="Struggling Subject" name="Hardest_Class" type="text" value={formData.Hardest_Class} onChange={handleChange} />
                 </Section>
                 <Section title="Habits" isDark={isDarkMode}>
                   <InputField label="Study Hrs/Week" name="Study_Hours_per_Week" value={formData.Study_Hours_per_Week} onChange={handleChange} isDark={isDarkMode} min={0} max={70} />
@@ -453,10 +456,11 @@ const Section = ({ title, children, isDark }) => (
   </div>
 );
 
-const InputField = ({ label, name, value, onChange, min, max }) => (
+// <-- Updated InputField to accept 'type' -->
+const InputField = ({ label, name, value, onChange, min, max, type = "number" }) => (
   <div className="flex flex-col">
     <label className="text-xs font-semibold mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis text-zinc-700 dark:text-zinc-300">{label}</label>
-    <input type="number" name={name} value={value} onChange={onChange} min={min} max={max} className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400" />
+    <input type={type} name={name} value={value} onChange={onChange} min={min} max={max} className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400" />
   </div>
 );
 
