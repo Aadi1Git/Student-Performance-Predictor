@@ -63,6 +63,7 @@ class StudentInput(BaseModel):
     Parent_Education_Level: str
     Family_Income_Level: str
     Internet_Access: str
+    Hardest_Class: str = ""  # <-- ADDED NEW FIELD (defaults to empty string)
 
 class ChatInput(BaseModel):
     student_data: StudentInput
@@ -92,6 +93,7 @@ def predict_performance(data: StudentInput):
         income_val = income_map.get(data.Family_Income_Level, 1)
 
         # --- CREATE DATAFRAME ---
+        # Note: We do NOT include Hardest_Class here because the XGBoost model wasn't trained on it
         input_dict = {
             'Difficulty_Level': [difficulty_val],
             'Attendance (%)': [data.Attendance], 
@@ -122,6 +124,9 @@ def predict_performance(data: StudentInput):
         real_ai_plan = ""
         
         if groq_client:
+            # Inject the difficult class context if the user provided it
+            subject_context = f"\n            - Struggling Subject: {data.Hardest_Class}" if data.Hardest_Class else ""
+            
             prompt = f"""
             A student in the {data.Branch} branch has these metrics:
             - Midterm Score: {data.Midterm_Score}/100
@@ -131,11 +136,12 @@ def predict_performance(data: StudentInput):
             - Study Hours/Week: {data.Study_Hours_per_Week}
             - Attendance: {data.Attendance}%
             - Sleep Hours: {data.Sleep_Hours_per_Night}
-            - Stress Level: {data.Stress_Level}/10
+            - Stress Level: {data.Stress_Level}/10{subject_context}
             
             Their predicted final score is {round(final_score, 1)}/100.
             
             Identify their top weakest areas based ONLY on this data. Write exactly 3 short, actionable bullet points advising them on how to turn those specific weak areas into strong areas. 
+            If a struggling subject is provided, tailor your advice to include strategies specifically for mastering that subject.
             Do not use introductory text. Just provide the 3 bullet points starting with a dash (-).
             """
             
@@ -166,14 +172,18 @@ def predict_performance(data: StudentInput):
         traceback.print_exc() 
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/chat")
 def chat_with_advisor(data: ChatInput):
     if not groq_client:
         raise HTTPException(status_code=503, detail="Groq API offline")
 
+    # Inject the difficult class context if the user provided it
+    subject_context = f" They have specifically noted they are struggling with {data.student_data.Hardest_Class}." if data.student_data.Hardest_Class else ""
+
     # We inject the student's exact stats so the AI knows who it is talking to!
     prompt = f"""
-    You are an expert academic advisor helping an engineering student in the {data.student_data.Branch} branch.
+    You are an expert academic advisor helping an engineering student in the {data.student_data.Branch} branch.{subject_context}
     Their current data: Midterm: {data.student_data.Midterm_Score}/100, Study: {data.student_data.Study_Hours_per_Week}hrs/wk, Sleep: {data.student_data.Sleep_Hours_per_Night}hrs/night, Attendance: {data.student_data.Attendance}%, Stress: {data.student_data.Stress_Level}/10.
 
     The student asks: "{data.question}"
