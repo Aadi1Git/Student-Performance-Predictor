@@ -498,4 +498,145 @@ const App = () => {
 };
 
 // ... YOUR REUSABLE COMPONENTS GO BELOW THIS LINE (Section, InputField, SelectField, SliderField, AuthScreen)
+const Section = ({ title, children, isDark }) => (
+  <div>
+    <h3 className="text-xs font-bold uppercase tracking-widest mb-4 pb-2 border-b text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800">{title}</h3>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">{children}</div>
+  </div>
+);
+
+// <-- Updated InputField to accept 'type' -->
+const InputField = ({ label, name, value, onChange, min, max, type = "number" }) => (
+  <div className="flex flex-col">
+    <label className="text-xs font-semibold mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis text-zinc-700 dark:text-zinc-300">{label}</label>
+    <input type={type} name={name} value={value} onChange={onChange} min={min} max={max} className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400" />
+  </div>
+);
+
+const SelectField = ({ label, name, value, onChange, options }) => (
+  <div className="flex flex-col">
+    <label className="text-xs font-semibold mb-1.5 text-zinc-700 dark:text-zinc-300">{label}</label>
+    <select name={name} value={value} onChange={onChange} className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors appearance-none cursor-pointer bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+      {options.map(opt => <option key={opt} value={opt} className="bg-white dark:bg-zinc-950">{opt}</option>)}
+    </select>
+  </div>
+);
+
+const SliderField = ({ label, name, value, onChange, min, max }) => (
+  <div className="flex flex-col">
+    <div className="flex justify-between items-center mb-2">
+      <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{label}</label>
+      <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300">{value}</span>
+    </div>
+    <input type="range" name={name} min={min} max={max} value={value} onChange={onChange} className="w-full h-1 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-50 bg-zinc-200 dark:border-zinc-800" />
+  </div>
+);
+
+// --- AUTH SCREEN ---
+const AuthScreen = ({ isLoginView, setIsLoginView, isDark, toggleTheme }) => {
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  
+  const [name, setName] = useState(''); 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      if (!isLoginView) {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: name });
+        await sendEmailVerification(userCredential.user);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+    } catch (err) {
+      let cleanError = err.message;
+      if (cleanError.includes('email-already-in-use')) cleanError = 'Email already registered.';
+      if (cleanError.includes('invalid-credential')) cleanError = 'Incorrect credentials.';
+      if (cleanError.includes('weak-password')) cleanError = 'Password must be at least 6 characters.';
+      setAuthError(cleanError);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  return (
+    <div className={`min-h-screen transition-colors duration-300 font-sans p-4 flex items-center justify-center
+      ${isDark ? 'bg-zinc-950 text-zinc-50' : 'bg-zinc-50 text-zinc-900'}`}>
+      
+      <div className="absolute top-6 right-6">
+        <button onClick={toggleTheme} className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors text-zinc-700 dark:text-zinc-300">
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+      </div>
+
+      <div className="w-full max-w-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl p-8 relative animate-fade-in-up">
+        
+        <div className="flex justify-center mb-6">
+          <div className="p-2.5 bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900 rounded-lg">
+            <BrainCircuit size={24} strokeWidth={2.5} />
+          </div>
+        </div>
+        
+        <h2 className="text-xl font-bold tracking-tight text-center mb-2">
+          {isLoginView ? 'Welcome back' : 'Create an account'}
+        </h2>
+        <p className="text-center text-zinc-500 dark:text-zinc-400 mb-6 text-sm">
+          {isLoginView ? 'Enter your details to sign in.' : 'Start analyzing performance.'}
+        </p>
+
+        {authError && (
+          <div className="mb-4 p-3 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 rounded-lg text-center text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {authError}
+          </div>
+        )}
+
+        <form onSubmit={handleAuthSubmit} className="space-y-4">
+          {!isLoginView && (
+            <div>
+              <label className="block text-xs font-semibold mb-1.5">Name</label>
+              <input type="text" required
+                value={name} onChange={(e) => setName(e.target.value)}
+                className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-transparent border-zinc-200 dark:border-zinc-800" />
+            </div>
+          )}
+          
+          <div>
+            <label className="block text-xs font-semibold mb-1.5">Email</label>
+            <input type="email" required
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-transparent border-zinc-200 dark:border-zinc-800" />
+          </div>
+
+          <div>
+             <label className="block text-xs font-semibold mb-1.5">Password</label>
+            <input type="password" required
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2.5 rounded-lg border text-sm focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-zinc-900 dark:focus:border-zinc-50 outline-none transition-colors bg-transparent border-zinc-200 dark:border-zinc-800" />
+          </div>
+
+          <button type="submit" disabled={authLoading}
+            className={`w-full py-2.5 mt-2 rounded-lg font-semibold text-sm transition-colors flex justify-center items-center gap-2
+              ${authLoading ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200'}`}
+          >
+            {authLoading ? <span className="animate-pulse">Loading...</span> : <>{isLoginView ? 'Sign in' : 'Sign up'}</>}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          {isLoginView ? "Don't have an account? " : "Already have an account? "}
+          <button type="button" onClick={() => { setIsLoginView(!isLoginView); setAuthError(''); }} className="text-zinc-900 dark:text-zinc-50 font-semibold hover:underline">
+            {isLoginView ? 'Sign up' : 'Sign in'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 export default App;
