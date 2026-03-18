@@ -94,25 +94,17 @@ const App = () => {
     catch (error) { console.error("Error logging out:", error); }
   };
 
-  const handleDownloadPDF = async () => {
+const handleDownloadPDF = async () => {
     if (!reportRef.current) return;
     setIsDownloading(true);
     try {
       const element = reportRef.current;
-      
-      // --- THE MAGIC FIX ---
-      const originalHeight = element.style.height;
-      element.style.height = `${element.scrollHeight + 20}px`; 
-
       const canvas = await html2canvas(element, {
         scale: 2, 
         backgroundColor: isDarkMode ? '#09090b' : '#fafafa',
-        scrollY: -window.scrollY 
+        height: element.scrollHeight + 40, // Forces the screenshot to drop 40px lower
+        windowHeight: element.scrollHeight + 40 
       });
-
-      element.style.height = originalHeight; 
-      // ----------------------
-
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 210; 
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -121,13 +113,9 @@ const App = () => {
       
       const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Student';
       pdf.save(`${userName}_Performance_Report.pdf`);
-    } catch (err) { 
-      alert("Issue generating PDF."); 
-    } finally { 
-      setIsDownloading(false); 
-    }
+    } catch (err) { alert("Issue generating PDF."); } 
+    finally { setIsDownloading(false); }
   };
-
   // --- REALTIME DATABASE FETCH LOGIC ---
   const fetchUserHistory = async (userId) => {
     setIsLoadingHistory(true);
@@ -544,6 +532,7 @@ const App = () => {
                   </>
                 )}
               </div>
+              <div className="h-8 shrink-0"></div>
             </div>
           </div>
         ) : (
