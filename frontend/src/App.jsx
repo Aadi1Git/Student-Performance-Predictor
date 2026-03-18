@@ -376,8 +376,8 @@ const App = () => {
                   </Section>
                   
                   <Section title="Demographics" isDark={isDarkMode}>
-                    <SelectField label="Branch" name="Branch" value={formData.Branch} onChange={handleChange} isDark={isDarkMode} options={['Civil', 'ECE', 'EEE', 'ME', 'CS', 'Other']} />
-                    <SelectField label="Difficulty" name="Difficulty_Level" value={formData.Difficulty_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
+                    <SelectField label="Branch" name="Branch" value={formData.Branch} onChange={handleChange} isDark={isDarkMode} options={['Civil', 'ECE', 'EEE', 'ME', 'CSE', 'Other']} />
+                    <SelectField label="SemesterDifficulty" name="Difficulty_Level" value={formData.Difficulty_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
                     <SelectField label="Education" name="Parent_Education_Level" value={formData.Parent_Education_Level} onChange={handleChange} isDark={isDarkMode} options={['High School', 'College', 'Postgraduate']} />
                     <SelectField label="Income" name="Family_Income_Level" value={formData.Family_Income_Level} onChange={handleChange} isDark={isDarkMode} options={['Low', 'Medium', 'High']} />
                   </Section>
