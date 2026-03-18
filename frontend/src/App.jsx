@@ -104,7 +104,7 @@ const App = () => {
         backgroundColor: isDarkMode ? '#09090b' : '#fafafa',
         windowWidth: element.scrollWidth, 
         windowHeight: element.scrollHeight,
-        height: element.offsetHeight + 10 // Added a 10px buffer to prevent clipping
+
       });
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 210; 
@@ -424,7 +424,7 @@ const App = () => {
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="lg:col-span-5 flex flex-col gap-6 h-full pb-2" ref={reportRef}>
+            <div className="lg:col-span-5 flex flex-col gap-6 h-full pb-8" ref={reportRef}>
               <div className={`${cardClass} p-4 flex justify-between items-center`}>
                 <div>
                   <h3 className="text-sm font-bold flex items-center gap-2"><Award className="w-4 h-4" /> Report</h3>
