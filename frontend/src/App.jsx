@@ -99,12 +99,21 @@ const handleDownloadPDF = async () => {
     setIsDownloading(true);
     try {
       const element = reportRef.current;
+      
+      // Temporarily stretch the DOM to prevent clipping
+      const originalHeight = element.style.height;
+      element.style.height = 'max-content';
+
       const canvas = await html2canvas(element, {
         scale: 2, 
         backgroundColor: isDarkMode ? '#09090b' : '#fafafa',
-        height: element.scrollHeight + 40, // Forces the screenshot to drop 40px lower
-        windowHeight: element.scrollHeight + 40 
+        scrollY: -window.scrollY, 
+        height: element.scrollHeight + 40 // Add 40px buffer
       });
+
+      // Revert the stretch
+      element.style.height = originalHeight;
+
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 210; 
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -532,7 +541,8 @@ const handleDownloadPDF = async () => {
                   </>
                 )}
               </div>
-              <div className="h-8 shrink-0"></div>
+              {/* --- MAGIC PDF SPACER --- */}
+              <div className="h-12 w-full shrink-0 text-transparent">.</div>
             </div>
           </div>
         ) : (
