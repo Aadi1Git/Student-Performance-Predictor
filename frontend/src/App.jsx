@@ -6,7 +6,6 @@ import { Moon, Sun, Award, BrainCircuit, Lightbulb, Mail, Lock, User, ArrowRight
 // Firebase Imports
 import { auth, db } from './firebase'; 
 import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
-// --- REALTIME DATABASE IMPORTS ---
 import { ref, push, set, get, child, serverTimestamp } from 'firebase/database';
 
 // PDF Imports
@@ -279,11 +278,24 @@ const App = () => {
             <h1 className="text-xl font-bold tracking-tight">Predictor</h1>
           </div>
           
-          <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg w-full sm:w-auto">
-            <button onClick={() => setActiveTab('predictor')} className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition-all flex-1 sm:flex-none justify-center ${activeTab === 'predictor' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}>
-              <Activity size={16} /> Dashboard
+          {/* --- NEW 3-PART TAB NAVIGATION --- */}
+          <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg w-full md:w-auto overflow-x-auto">
+            <button 
+              onClick={() => { setActiveTab('predictor'); setIsGoalMode(false); }} 
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition-all whitespace-nowrap ${activeTab === 'predictor' && !isGoalMode ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
+            >
+              <Activity size={16} /> Predictor
             </button>
-            <button onClick={() => setActiveTab('history')} className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition-all flex-1 sm:flex-none justify-center ${activeTab === 'history' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}>
+            <button 
+              onClick={() => { setActiveTab('predictor'); setIsGoalMode(true); setGoalResult(null); setPrediction(null); setInsights([]); }} 
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition-all whitespace-nowrap ${activeTab === 'predictor' && isGoalMode ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
+            >
+              <Target size={16} /> Goal Mode
+            </button>
+            <button 
+              onClick={() => setActiveTab('history')} 
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition-all whitespace-nowrap ${activeTab === 'history' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
+            >
               <History size={16} /> History
             </button>
           </div>
@@ -303,21 +315,6 @@ const App = () => {
             {/* LEFT COLUMN */}
             <div className="lg:col-span-7 flex flex-col gap-6 h-full">
               <div className={`${cardClass} p-6 sm:p-8 flex-grow flex flex-col`}>
-                
-                {/* Goal Mode Toggle */}
-                <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800 mb-6">
-                  <div className="flex items-center gap-3">
-                    <Target className="text-zinc-500 dark:text-zinc-400" size={20} />
-                    <div>
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Goal Mode</p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">Find the grades needed to hit a target score</p>
-                    </div>
-                  </div>
-                  <button type="button" onClick={() => { setIsGoalMode(!isGoalMode); setGoalResult(null); setPrediction(null); }} className={`w-12 h-6 rounded-full transition-colors relative ${isGoalMode ? 'bg-zinc-900 dark:bg-zinc-50' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
-                    <div className={`w-4 h-4 rounded-full bg-white dark:bg-zinc-950 absolute top-1 transition-transform ${isGoalMode ? 'translate-x-7' : 'translate-x-1'}`} />
-                  </button>
-                </div>
-
                 <form onSubmit={handleSubmit} className="space-y-8 h-full flex flex-col">
                   
                   {isGoalMode && (
@@ -335,7 +332,7 @@ const App = () => {
                         <InputField label="Projects(0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
                       </>
                     )}
-                    <InputField label="Struggling Subject" name="Hardest_Class" type="text" value={formData.Hardest_Class} onChange={handleChange} />
+                    <InputField label="Struggling Subject" name="Hardest_Class" type="text" value={formData.Hardest_Class} onChange={handleChange} type="text" />
                   </Section>
                   
                   <Section title="Habits" isDark={isDarkMode}>
