@@ -65,6 +65,10 @@ class StudentInput(BaseModel):
     Internet_Access: str
     Hardest_Class: str = ""  # <-- ADDED NEW FIELD (defaults to empty string)
 
+class GoalInput(BaseModel):
+    student_data: StudentInput
+    target_score: float
+
 class ChatInput(BaseModel):
     student_data: StudentInput
     question: str
@@ -204,6 +208,86 @@ def chat_with_advisor(data: ChatInput):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@app.post("/goal")
+def reverse_calculate_goal(data: GoalInput):
+    if not model:
+        raise HTTPException(status_code=500, detail="Model not loaded")
+    
+    # Helper function to run the model quickly
+    def get_prediction(student_data):
+        input_dict = {
+            'Difficulty_Level': [{'Low': 0, 'Medium': 1, 'High': 2}.get(student_data.Difficulty_Level, 1)],
+            'Attendance (%)': [student_data.Attendance], 
+            'Midterm_Score': [student_data.Midterm_Score],
+            'Assignments_Avg': [student_data.Assignments_Avg],
+            'Quizzes_Avg': [student_data.Quizzes_Avg],
+            'Participation_Score': [student_data.Participation_Score],
+            'Projects_Score': [student_data.Projects_Score],
+            'Study_Hours_per_Week': [student_data.Study_Hours_per_Week],
+            'Parent_Education_Level': [{'High School': 0, 'College': 1, 'Postgraduate': 2}.get(student_data.Parent_Education_Level, 1)],
+            'Family_Income_Level': [{'Low': 0, 'Medium': 1, 'High': 2}.get(student_data.Family_Income_Level, 1)],
+            'Stress_Level': [student_data.Stress_Level],
+            'Sleep_Hours_per_Night': [student_data.Sleep_Hours_per_Night],
+            'Branch_Civil': [1 if student_data.Branch == 'Civil' else 0],
+            'Branch_ECE': [1 if student_data.Branch == 'ECE' else 0],
+            'Branch_EEE': [1 if student_data.Branch == 'EEE' else 0],
+            'Branch_ME': [1 if student_data.Branch == 'ME' else 0],
+            'Internet_Access_at_Home_Yes': [1 if student_data.Internet_Access == 'Yes' else 0]
+        }
+        df = pd.DataFrame(input_dict)
+        return float(model.predict(df)[0])
+
+    # 1. Check current trajectory
+    current_prediction = get_prediction(data.student_data)
+    
+    if current_prediction >= data.target_score:
+        return {
+            "status": "on_track",
+            "message": f"You are already on track to hit {current_prediction:.1f}, which beats your goal of {data.target_score}!",
+            "required_metrics": None
+        }
+
+    # 2. Optimization Loop (Iteratively increase grades until target is hit)
+    # We use .dict() and ** to safely copy the pydantic model
+    test_data = StudentInput(**data.student_data.dict())
+    
+    # Max possible scores
+    MAX_ASSIGN = 10.0
+    MAX_QUIZ = 10.0
+    MAX_PROJ = 20.0
+    
+    iterations = 0
+    while current_prediction < data.target_score and iterations < 100:
+        # Increment remaining coursework
+        if test_data.Assignments_Avg < MAX_ASSIGN: test_data.Assignments_Avg += 0.2
+        if test_data.Quizzes_Avg < MAX_QUIZ: test_data.Quizzes_Avg += 0.2
+        if test_data.Projects_Score < MAX_PROJ: test_data.Projects_Score += 0.5
+        
+        current_prediction = get_prediction(test_data)
+        iterations += 1
+        
+        # Break if we've maxed out all grades
+        if test_data.Assignments_Avg >= MAX_ASSIGN and test_data.Quizzes_Avg >= MAX_QUIZ and test_data.Projects_Score >= MAX_PROJ:
+            break
+
+    # 3. Return results
+    if current_prediction >= data.target_score:
+        return {
+            "status": "achievable",
+            "message": f"To hit a {data.target_score}, you need to average these scores on your remaining work:",
+            "required_metrics": {
+                "Assignments": min(round(test_data.Assignments_Avg, 1), MAX_ASSIGN),
+                "Quizzes": min(round(test_data.Quizzes_Avg, 1), MAX_QUIZ),
+                "Projects": min(round(test_data.Projects_Score, 1), MAX_PROJ)
+            }
+        }
+    else:
+        return {
+            "status": "unachievable",
+            "message": "Even with perfect 100% scores on all remaining assignments, quizzes, and projects, the model predicts you will fall slightly short of this specific goal. Aiming for maximum effort is still highly recommended!",
+            "required_metrics": None
+        }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
