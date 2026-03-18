@@ -332,7 +332,7 @@ const App = () => {
                         <InputField label="Projects(0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
                       </>
                     )}
-                    <InputField label="Struggling Subject" name="Hardest_Class" type="text" value={formData.Hardest_Class} onChange={handleChange} type="text" />
+              <InputField label="Struggling Subject" name="Hardest_Class" type="text" value={formData.Hardest_Class} onChange={handleChange} />
                   </Section>
                   
                   <Section title="Habits" isDark={isDarkMode}>
