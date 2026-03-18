@@ -101,17 +101,15 @@ const App = () => {
       const element = reportRef.current;
       
       // --- THE MAGIC FIX ---
-      // Temporarily force the container to expand past its boundary
       const originalHeight = element.style.height;
       element.style.height = `${element.scrollHeight + 20}px`; 
 
       const canvas = await html2canvas(element, {
         scale: 2, 
         backgroundColor: isDarkMode ? '#09090b' : '#fafafa',
-        scrollY: -window.scrollY // This stops scroll position from clipping it
+        scrollY: -window.scrollY 
       });
 
-      // Instantly shrink it back to normal
       element.style.height = originalHeight; 
       // ----------------------
 
@@ -129,6 +127,7 @@ const App = () => {
       setIsDownloading(false); 
     }
   };
+
   // --- REALTIME DATABASE FETCH LOGIC ---
   const fetchUserHistory = async (userId) => {
     setIsLoadingHistory(true);
@@ -313,7 +312,6 @@ const App = () => {
             <h1 className="text-xl font-bold tracking-tight">Predictor</h1>
           </div>
           
-          {/* --- NEW 3-PART TAB NAVIGATION --- */}
           <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg w-full md:w-auto overflow-x-auto">
             <button 
               onClick={() => { setActiveTab('predictor'); setIsGoalMode(false); }} 
@@ -367,7 +365,7 @@ const App = () => {
                         <InputField label="Projects(0-20)" name="Projects_Score" value={formData.Projects_Score} onChange={handleChange} isDark={isDarkMode} min={0} max={20} />
                       </>
                     )}
-              <InputField label="Struggling Subject" name="Hardest_Class" type="text" value={formData.Hardest_Class} onChange={handleChange} />
+                    <InputField label="Struggling Subject" name="Hardest_Class" type="text" value={formData.Hardest_Class} onChange={handleChange} />
                   </Section>
                   
                   <Section title="Habits" isDark={isDarkMode}>
