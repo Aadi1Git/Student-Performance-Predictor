@@ -162,9 +162,29 @@ const App = () => {
           target_score: parseFloat(targetScore)
         });
         
-        setGoalResult(response.data);
+        const result = response.data;
+        setGoalResult(result);
         setPrediction(null); // Clear standard prediction view
-        setInsights(["Based on your goal calculation, review the required metrics above.", "Adjust your study hours if the required scores are very high."]);
+        
+        // --- DYNAMIC AI INSIGHTS FOR GOAL MODE ---
+        if (result.status === 'on_track') {
+          setInsights([
+            "Keep doing exactly what you're doing. Your current habits are working beautifully.",
+            "Avoid complacency; maintain your current study hours and class participation."
+          ]);
+        } else if (result.status === 'achievable') {
+          setInsights([
+            "Focus heavily on the required metrics shown above to bridge the gap.",
+            "If the required project score is high, start outlining and working on it immediately.",
+            "Consider increasing your weekly study hours slightly to build a safety net."
+          ]);
+        } else if (result.status === 'unachievable') {
+          setInsights([
+            "Your target is mathematically highly improbable given your current midterm baseline.",
+            "Focus on maximizing your learning and understanding rather than chasing a specific number.",
+            "Try lowering your target by a few points to set a realistic, achievable milestone."
+          ]);
+        }
         
       } else {
         // --- STANDARD PREDICT API CALL ---
