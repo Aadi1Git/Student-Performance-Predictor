@@ -56,7 +56,7 @@ const App = () => {
     Sleep_Hours_per_Night: 7,
     Stress_Level: 5,
     Participation_Score: 8,
-    Branch: 'CS',
+    Branch: 'CSE',
     Difficulty_Level: 'Medium',
     Parent_Education_Level: 'College',
     Family_Income_Level: 'Medium',
