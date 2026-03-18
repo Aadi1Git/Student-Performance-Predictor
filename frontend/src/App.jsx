@@ -89,32 +89,40 @@ const App = () => {
     });
   };
 
-  const handleLogout = async () => {
-    try { await signOut(auth); } 
-    catch (error) { console.error("Error logging out:", error); }
-  };
-
-  const handleDownloadPDF = async () => {
+const handleDownloadPDF = async () => {
     if (!reportRef.current) return;
     setIsDownloading(true);
     try {
       const element = reportRef.current;
+      
+      // --- THE MAGIC FIX ---
+      // Temporarily force the container to expand past its boundary
+      const originalHeight = element.style.height;
+      element.style.height = `${element.scrollHeight + 20}px`; 
+
       const canvas = await html2canvas(element, {
         scale: 2, 
         backgroundColor: isDarkMode ? '#09090b' : '#fafafa',
-        windowWidth: element.scrollWidth, 
-        windowHeight: element.scrollHeight,
-
+        scrollY: -window.scrollY // This stops scroll position from clipping it
       });
+
+      // Instantly shrink it back to normal
+      element.style.height = originalHeight; 
+      // ----------------------
+
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 210; 
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       const pdf = new jsPDF('p', 'mm', [imgWidth, imgHeight]);
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
       const userName = auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Student';
       pdf.save(`${userName}_Performance_Report.pdf`);
-    } catch (err) { alert("Issue generating PDF."); } 
-    finally { setIsDownloading(false); }
+    } catch (err) { 
+      alert("Issue generating PDF."); 
+    } finally { 
+      setIsDownloading(false); 
+    }
   };
 
   // --- REALTIME DATABASE FETCH LOGIC ---
