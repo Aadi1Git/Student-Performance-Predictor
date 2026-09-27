@@ -214,11 +214,31 @@ Returns:
 
 ![AI](frontend/screenshots/ai-study-plan.png)
 
-## Model Development
+## 🧠 Model Development
 
-The prediction model was trained using **XGBoost Regressor** on 17 academic, behavioral, and socioeconomic features.
+The prediction model was developed using **XGBoost Regressor** and trained on **17 academic, behavioral, and socioeconomic features**.
 
-### Top Contributing Features
+### Model Configuration
+
+| Parameter | Value |
+|-----------|-------|
+| Algorithm | XGBoost Regressor |
+| Number of Features | 17 |
+| Estimators | 300 |
+| Max Depth | 3 |
+| Learning Rate | 0.05 |
+
+### Feature Engineering
+
+The backend preprocesses user input before prediction by:
+
+- Encoding categorical variables (Branch, Difficulty Level, Parent Education, Family Income, and Internet Access).
+- Converting the processed inputs into a Pandas DataFrame.
+- Passing the feature vector to the trained XGBoost model (`model.pkl`) for real-time score prediction.
+
+### Most Influential Features
+
+Based on the trained model's feature importance:
 
 | Feature | Importance |
 |---------|-----------:|
@@ -230,23 +250,7 @@ The prediction model was trained using **XGBoost Regressor** on 17 academic, beh
 | Difficulty Level | 0.0308 |
 | Attendance | 0.0253 |
 
-The model gives the highest importance to **Midterm Score**, indicating that prior academic performance is the strongest predictor of final performance in this model.
-
-### Evaluation Metrics
-
-| Metric | Value |
-|--------|------:|
-| MAE | 9.15 |
-| RMSE | 17.26 |
-| R² | 0.8985 |
-
-### Actual vs Predicted
-
-![Actual vs Predicted](reports/figures/actual_vs_predicted.png)
-
-### Feature Importance
-
-![Feature Importance](reports/figures/feature_importance.png)
+The model assigns the highest importance to **Midterm Score**, indicating that previous academic performance is the strongest predictor of the final predicted score in this model.
 
 ## Future Improvements
 
