@@ -35,6 +35,15 @@ The project demonstrates an end-to-end ML deployment workflow from prediction to
 - Firebase integration
 - Performance visualization using Recharts
 
+## 🚀 What Makes This Project Unique
+
+Unlike traditional student performance prediction systems, this project combines **Machine Learning** and **Generative AI**.
+
+- **XGBoost** predicts the student's final academic score.
+- **Groq Llama 3** generates personalized study recommendations based on the predicted performance and the student's most challenging subject.
+- **FastAPI** serves real-time predictions through a REST API.
+- **React + Recharts** provides an interactive dashboard with downloadable PDF reports.
+
 ## 🎥 Demo
 
 | Prediction Page | Dashboard |
@@ -113,30 +122,20 @@ Compared with Linear Regression:
 
 ## 📂 Project Structure
 
+```text
 Student-Performance-Predictor/
-
 ├── backend/
-
-│ ├── main.py
-
-│ ├── model.pkl
-
-│ ├── requirements.txt
-
-│ └── test_model.py
-
+│   ├── main.py
+│   ├── model.pkl
+│   ├── requirements.txt
+│   └── test_model.py
 ├── frontend/
-
-│ ├── src/
-
-│ ├── public/
-
-│ ├── package.json
-
-│ └── vite.config.js
-
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.js
 └── README.md
-
+```
 ## 🚀 Installation
 
 ### Clone Repository
@@ -148,21 +147,26 @@ cd Student-Performance-Predictor
 
 ### Backend
 
+```bash
 cd backend
 
 python -m venv venv
 
+# Windows
 venv\Scripts\activate
 
 pip install -r requirements.txt
+```
 
 ### Frontend
 
+```bash
 cd frontend
 
 npm install
 
 npm run dev
+```
 
 ## Environment Variables
 
@@ -170,15 +174,19 @@ Create a `.env` file inside the backend folder.
 
 GROQ_API_KEY=your_api_key_here
 
-## ▶ Running the Project
+## ▶️ Running the Project
 
-Start FastAPI
+### Start FastAPI
 
+```bash
 uvicorn main:app --reload
+```
 
-Start React
+### Start React
 
+```bash
 npm run dev
+```
 
 ## 🔌 API
 
@@ -271,4 +279,4 @@ The model assigns the highest importance to **Midterm Score**, indicating that p
 B.Tech Computer Science Engineering — KIIT University
 
 - GitHub: [Aadi1Git](https://github.com/Aadi1Git)
-- LinkedIn: *(www.linkedin.com/in/aaditya-jaysawal-487404298)*
+- LinkedIn: [Aaditya Jaysawal](https://www.linkedin.com/in/aaditya-jaysawal-487404298)
