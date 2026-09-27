@@ -35,29 +35,32 @@ The project demonstrates an end-to-end ML deployment workflow from prediction to
 - Firebase integration
 - Performance visualization using Recharts
 
-  ## 🏗 System Architecture
+## 🎥 Demo
 
+| Prediction Page | Dashboard |
+|----------------|-----------|
+| ![](frontend/screenshots/prediction-page.png) | ![](frontend/screenshots/dashboard.png) |
+
+## 🏗 System Architecture
+
+```text
 Student Input
-
-↓
-
+      │
+      ▼
 React Frontend (Vite)
-
-↓
-
+      │
+      ▼
 FastAPI Backend
-
-↓
-
+      │
+      ▼
 XGBoost Model
-
-↓
-
+      │
+      ▼
 Predicted Score
-
-↓
-
+      │
+      ▼
 Groq AI Study Plan
+```
 
 ## Machine Learning Pipeline
 
@@ -84,31 +87,16 @@ Groq AI Study Plan
 
 ## 📊 Dataset
 
-The model predicts student performance using:
+The model predicts a student's final academic performance using **17 academic, behavioral, and socioeconomic features** collected through the application form.
 
-- Midterm Score
-- Assignment Average
-- Quiz Average
-- Project Score
-- Attendance
-- Study Hours
-- Sleep Hours
-- Stress Level
-- Participation Score
-- Branch
-- Difficulty Level
-- Parent Education
-- Family Income
-- Internet Access
-
-  ## 🧠 Machine Learning Methodology
-
-1. User enters student information.
-2. FastAPI converts categorical inputs into numerical values.
-3. Features are stored in a Pandas DataFrame.
-4. The trained XGBoost model predicts the final score.
-5. The student's information is sent to Groq AI.
-6. Personalized study recommendations are returned.
+| Category | Features |
+|----------|----------|
+| Academic | Midterm Score, Assignment Average, Quiz Average, Project Score |
+| Study Habits | Study Hours, Sleep Hours |
+| Classroom Behavior | Attendance, Participation |
+| Personal | Stress Level |
+| Background | Branch, Parent Education, Family Income, Internet Access |
+| Course | Difficulty Level |
 
 ## Why XGBoost?
 
@@ -153,9 +141,10 @@ Student-Performance-Predictor/
 
 ### Clone Repository
 
+```bash
 git clone https://github.com/Aadi1Git/Student-Performance-Predictor.git
-
 cd Student-Performance-Predictor
+```
 
 ### Backend
 
@@ -191,14 +180,28 @@ Start React
 
 npm run dev
 
-## API
+## 🔌 API
 
-### POST /predict
+### POST `/predict`
 
-Returns:
+**Request**
 
-- Predicted Score
-- AI-generated Study Plan
+```json
+{
+  "Midterm_Score":78,
+  "Assignments_Avg":82,
+  "Attendance":90
+}
+```
+
+**Response**
+
+```json
+{
+  "predicted_score":84.6,
+  "study_plan":"..."
+}
+```
 
 ## Screenshots
 
@@ -267,4 +270,5 @@ The model assigns the highest importance to **Midterm Score**, indicating that p
 
 B.Tech Computer Science Engineering — KIIT University
 
-GitHub: https://github.com/Aadi1Git
+- GitHub: [Aadi1Git](https://github.com/Aadi1Git)
+- LinkedIn: *(www.linkedin.com/in/aaditya-jaysawal-487404298)*
