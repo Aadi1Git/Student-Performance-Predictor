@@ -59,6 +59,16 @@ Predicted Score
 
 Groq AI Study Plan
 
+## Machine Learning Pipeline
+
+1. Student enters academic information.
+2. FastAPI validates inputs.
+3. Categorical variables are encoded.
+4. Features are converted into a Pandas DataFrame.
+5. XGBoost predicts the final score.
+6. Groq AI generates a personalized study plan.
+7. Results are displayed in the dashboard and exportable as PDF.
+
 ## 🛠 Tech Stack
 
 | Category | Technology |
@@ -206,7 +216,21 @@ Returns:
 
 ## Model Development
 
-The XGBoost model was trained on student academic and behavioral features.
+The prediction model was trained using **XGBoost Regressor** on 17 academic, behavioral, and socioeconomic features.
+
+### Top Contributing Features
+
+| Feature | Importance |
+|---------|-----------:|
+| Midterm Score | 0.6216 |
+| Assignments Average | 0.1394 |
+| Projects Score | 0.0716 |
+| Quizzes Average | 0.0387 |
+| Study Hours per Week | 0.0348 |
+| Difficulty Level | 0.0308 |
+| Attendance | 0.0253 |
+
+The model gives the highest importance to **Midterm Score**, indicating that prior academic performance is the strongest predictor of final performance in this model.
 
 ### Evaluation Metrics
 
