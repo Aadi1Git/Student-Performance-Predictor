@@ -8,6 +8,24 @@
 ![XGBoost](https://img.shields.io/badge/XGBoost-ML-orange)
 ![Groq](https://img.shields.io/badge/Groq-Llama3-black)
 
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [What Makes This Project Unique](#-what-makes-this-project-unique)
+- [Demo](#-demo)
+- [System Architecture](#-system-architecture)
+- [Machine Learning Pipeline](#-machine-learning-pipeline)
+- [Tech Stack](#-tech-stack)
+- [Dataset](#-dataset)
+- [Project Structure](#-project-structure)
+- [Installation](#-installation)
+- [API](#-api)
+- [Screenshots](#-screenshots)
+- [Model Development](#-model-development)
+- [Future Improvements](#-future-improvements)
+- [Author](#-author)
+
 ## 📖 Overview
 
 Student Performance Predictor is a full-stack Machine Learning application that predicts a student's final academic performance using academic, behavioral, and socioeconomic factors.
@@ -71,7 +89,7 @@ Predicted Score
 Groq AI Study Plan
 ```
 
-## Machine Learning Pipeline
+## 🧠 Machine Learning Pipeline
 
 1. Student enters academic information.
 2. FastAPI validates inputs.
@@ -168,11 +186,13 @@ npm install
 npm run dev
 ```
 
-## Environment Variables
+## 🔑 Environment Variables
 
-Create a `.env` file inside the backend folder.
+Create a `.env` file inside the `backend` folder.
 
+```env
 GROQ_API_KEY=your_api_key_here
+```
 
 ## ▶️ Running the Project
 
@@ -196,9 +216,13 @@ npm run dev
 
 ```json
 {
-  "Midterm_Score":78,
-  "Assignments_Avg":82,
-  "Attendance":90
+  "Midterm_Score": 78,
+  "Assignments_Avg": 82,
+  "Quizzes_Avg": 75,
+  "Projects_Score": 88,
+  "Study_Hours_per_Week": 16,
+  "Attendance": 92,
+  "Branch": "CSE"
 }
 ```
 
